@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0E1114">
+<title>Log</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{
+  --ink:#0E1114; --panel:#171B20; --panel-2:#1E242B; --line:#2A313A;
+  --text:#E8E2D6; --dim:#868D96; --dimmer:#5B626B;
+  --amber:#E9A23B; --moss:#7FA06B; --slate:#6E8AA8; --violet:#9483B4; --sea:#6FA39C;
+  --sheet-h: 0px;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html,body{margin:0; padding:0; height:100%}
+body{
+  background:var(--ink); color:var(--text); font-family:var(--sans);
+  font-size:16px; line-height:1.4;
+  overscroll-behavior-y:none;
+  padding-bottom:calc(84px + env(safe-area-inset-bottom));
+}
+button{font:inherit; color:inherit; background:none; border:none; cursor:pointer}
+:focus-visible{outline:2px solid var(--amber); outline-offset:2px}
+
+/* ---- hero: time since last feed ---- */
+.hero{
+  padding:calc(20px + env(safe-area-inset-top)) 20px 18px;
+  border-bottom:1px solid var(--line);
+}
+.hero .eyebrow{
+  font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--dimmer); font-family:var(--mono);
+}
+.hero .clock{
+  font-family:var(--mono); font-size:64px; line-height:1; font-weight:500;
+  font-variant-numeric:tabular-nums; letter-spacing:-.03em;
+  margin:6px 0 4px; color:var(--dim);
+  transition:color .6s ease;
+}
+.hero .clock.warm{color:var(--text)}
+.hero .clock.late{color:var(--amber)}
+.hero .last{font-size:13px; color:var(--dimmer); font-family:var(--mono)}
+
+/* ---- active sleep banner ---- */
+.active{
+  display:none; align-items:center; gap:12px;
+  margin:0; padding:14px 20px;
+  background:var(--panel); border-bottom:1px solid var(--line);
+}
+.active.on{display:flex}
+.active .pip{width:8px; height:8px; border-radius:50%; background:var(--violet); flex:none}
+.active .txt{flex:1; font-size:14px; font-family:var(--mono); color:var(--dim)}
+.active .txt b{color:var(--text); font-weight:500}
+.active button{
+  padding:8px 16px; border:1px solid var(--line); border-radius:999px;
+  font-size:14px; color:var(--text);
+}
+
+/* ---- today totals ---- */
+.totals{
+  display:flex; gap:0; padding:14px 20px; border-bottom:1px solid var(--line);
+  font-family:var(--mono); font-size:12px;
+}
+.totals div{flex:1}
+.totals .k{color:var(--dimmer); display:block; font-size:10px; letter-spacing:.1em; text-transform:uppercase}
+.totals .v{color:var(--text); font-size:17px; font-variant-numeric:tabular-nums}
+
+/* ---- log ---- */
+.log{padding:8px 0 20px}
+.daymark{
+  padding:18px 20px 6px; font-family:var(--mono); font-size:11px;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--dimmer);
+}
+.row{
+  display:flex; align-items:baseline; gap:12px; width:100%;
+  padding:12px 20px; text-align:left; border-bottom:1px solid #1A1F25;
+}
+.row:active{background:var(--panel)}
+.row .t{font-family:var(--mono); font-size:14px; color:var(--dim); font-variant-numeric:tabular-nums; flex:none}
+.row .bar{width:3px; align-self:stretch; border-radius:2px; flex:none}
+.row .d{flex:1; font-size:15px}
+.row .n{display:block; font-size:13px; color:var(--dimmer); margin-top:2px}
+.feed .bar{background:var(--amber)} .nappy .bar{background:var(--moss)}
+.pump .bar{background:var(--slate)} .sleep .bar{background:var(--violet)}
+.weight .bar{background:var(--sea)}
+
+/* ---- weight strip ---- */
+.weight-strip{
+  display:flex; align-items:baseline; gap:12px; width:100%; text-align:left;
+  padding:14px 20px; border-bottom:1px solid var(--line); font-family:var(--mono);
+}
+.weight-strip:active{background:var(--panel)}
+.weight-strip .k{
+  font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--dimmer); flex:none;
+}
+.weight-strip .kg{font-size:17px; color:var(--text); font-variant-numeric:tabular-nums}
+.weight-strip .meta{flex:1; text-align:right; font-size:12px; color:var(--dimmer)}
+.weight-strip .meta b{color:var(--sea); font-weight:500}
+
+.empty{padding:48px 20px; color:var(--dimmer); font-size:15px}
+
+/* ---- bottom action bar ---- */
+.bar-actions{
+  position:fixed; left:0; right:0; bottom:0; display:flex; gap:1px;
+  background:var(--line); border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.bar-actions button{
+  flex:1; background:var(--ink); padding:20px 4px 18px;
+  font-size:14px; font-weight:500;
+}
+.bar-actions button:active{background:var(--panel)}
+.bar-actions .ic{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.1em; color:var(--dimmer); margin-bottom:4px}
+
+/* ---- sheet ---- */
+.scrim{
+  position:fixed; inset:0; background:rgba(5,7,9,.72);
+  opacity:0; pointer-events:none; transition:opacity .18s ease; z-index:10;
+}
+.scrim.on{opacity:1; pointer-events:auto}
+.sheet{
+  position:fixed; left:0; right:0; bottom:0; z-index:11;
+  background:var(--panel); border-top:1px solid var(--line);
+  border-radius:18px 18px 0 0;
+  padding:8px 20px calc(24px + env(safe-area-inset-bottom));
+  transform:translateY(101%); transition:transform .22s cubic-bezier(.2,.8,.3,1);
+  max-height:88vh; overflow-y:auto;
+}
+.sheet.on{transform:translateY(0)}
+.grab{width:36px; height:4px; border-radius:2px; background:var(--line); margin:6px auto 16px}
+.sheet h2{margin:0 0 18px; font-size:19px; font-weight:600}
+.field{margin-bottom:18px}
+.field > label{
+  display:block; font-family:var(--mono); font-size:10px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--dimmer); margin-bottom:8px;
+}
+.chips{display:flex; gap:8px; flex-wrap:wrap}
+.chip{
+  padding:11px 16px; border:1px solid var(--line); border-radius:10px;
+  background:var(--panel-2); font-size:15px; color:var(--dim);
+}
+.chip[aria-pressed="true"]{background:var(--text); color:var(--ink); border-color:var(--text); font-weight:500}
+input[type="number"], input[type="time"], input[type="date"], input[type="text"]{
+  width:100%; padding:13px 14px; background:var(--panel-2);
+  border:1px solid var(--line); border-radius:10px; color:var(--text);
+  font-size:16px; font-family:var(--mono);
+}
+.timerow{display:flex; gap:8px; align-items:center}
+.timerow input[type="time"]{flex:1}
+.nudge{
+  padding:13px 12px; border:1px solid var(--line); border-radius:10px;
+  background:var(--panel-2); font-family:var(--mono); font-size:14px; color:var(--dim);
+}
+.sheet-actions{display:flex; gap:10px; margin-top:22px}
+.save{
+  flex:1; padding:16px; border-radius:12px; background:var(--text); color:var(--ink);
+  font-size:16px; font-weight:600;
+}
+.del{padding:16px 18px; border:1px solid var(--line); border-radius:12px; color:var(--amber); font-size:15px}
+.hide{display:none !important}
+
+/* ---- data footer ---- */
+.data{
+  display:flex; gap:10px; padding:24px 20px 40px; border-top:1px solid var(--line);
+  margin-top:12px;
+}
+.data button, .data label{
+  flex:1; text-align:center; padding:13px; border:1px solid var(--line);
+  border-radius:10px; font-size:14px; color:var(--dim); cursor:pointer;
+}
+.toast{
+  position:fixed; left:50%; bottom:100px; transform:translateX(-50%) translateY(8px);
+  background:var(--panel-2); border:1px solid var(--line); color:var(--text);
+  padding:11px 18px; border-radius:999px; font-size:14px; z-index:20;
+  opacity:0; pointer-events:none; transition:opacity .2s, transform .2s;
+}
+.toast.on{opacity:1; transform:translateX(-50%) translateY(0)}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important; animation:none !important}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <span class="eyebrow">since last feed</span>
+  <div class="clock" id="clock">—:—</div>
+  <div class="last" id="lastfeed">nothing logged yet</div>
+</header>
+
+<div class="active" id="activeSleep">
+  <span class="pip"></span>
+  <span class="txt">asleep <b id="sleepDur">0:00</b></span>
+  <button id="wakeBtn">Awake</button>
+</div>
+
+<section class="totals" id="totals" aria-label="Today">
+  <div><span class="k">feeds</span><span class="v" id="tFeeds">0</span></div>
+  <div><span class="k">bottle</span><span class="v" id="tBottle">0</span></div>
+  <div><span class="k">nappies</span><span class="v" id="tNappy">0</span></div>
+  <div><span class="k">pumped</span><span class="v" id="tPump">0</span></div>
+</section>
+
+<button class="weight-strip" id="weightStrip">
+  <span class="k">weight</span>
+  <span class="kg" id="wKg">— kg</span>
+  <span class="meta" id="wMeta">tap to log</span>
+</button>
+
+<main class="log" id="log"></main>
+
+<div class="data">
+  <button id="exportBtn">Export JSON</button>
+  <label>Import<input type="file" id="importFile" accept="application/json" hidden></label>
+</div>
+
+<nav class="bar-actions">
+  <button data-new="feed"><span class="ic">01</span>Feed</button>
+  <button data-new="nappy"><span class="ic">02</span>Nappy</button>
+  <button data-new="pump"><span class="ic">03</span>Pump</button>
+  <button data-new="sleep" id="sleepBtn"><span class="ic">04</span>Sleep</button>
+</nav>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true">
+  <div class="grab"></div>
+  <h2 id="sheetTitle">Feed</h2>
+
+  <div class="field" id="fMethod">
+    <label>Method</label>
+    <div class="chips" data-group="method">
+      <button class="chip" data-val="breast">Breast</button>
+      <button class="chip" data-val="bottle">Bottle</button>
+    </div>
+  </div>
+
+  <div class="field" id="fSide">
+    <label>Side</label>
+    <div class="chips" data-group="side">
+      <button class="chip" data-val="L">Left</button>
+      <button class="chip" data-val="R">Right</button>
+      <button class="chip" data-val="both">Both</button>
+    </div>
+  </div>
+
+  <div class="field" id="fNappy">
+    <label>Type</label>
+    <div class="chips" data-group="nappy">
+      <button class="chip" data-val="wet">Wet</button>
+      <button class="chip" data-val="dirty">Dirty</button>
+      <button class="chip" data-val="both">Both</button>
+    </div>
+  </div>
+
+  <div class="field" id="fAmount">
+    <label id="amountLabel">Amount (ml)</label>
+    <input type="number" id="amount" inputmode="numeric" step="5" min="0" placeholder="60">
+  </div>
+
+  <div class="field" id="fMins">
+    <label>Duration (min)</label>
+    <input type="number" id="mins" inputmode="numeric" step="1" min="0" placeholder="15">
+  </div>
+
+  <div class="field" id="fKg">
+    <label>Weight (kg)</label>
+    <input type="number" id="kg" inputmode="decimal" step="0.01" min="0" placeholder="4.70">
+  </div>
+
+  <div class="field" id="fDate">
+    <label>Date</label>
+    <input type="date" id="date">
+  </div>
+
+  <div class="field" id="fTime">
+    <label id="timeLabel">Time</label>
+    <div class="timerow">
+      <input type="time" id="time">
+      <button class="nudge" data-nudge="-5">−5</button>
+      <button class="nudge" data-nudge="-15">−15</button>
+      <button class="nudge" data-nudge="-30">−30</button>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Notes</label>
+    <input type="text" id="notes" placeholder="optional">
+  </div>
+
+  <div class="sheet-actions">
+    <button class="save" id="saveBtn">Save</button>
+    <button class="del hide" id="delBtn">Delete</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- storage ---------- */
+const DB = 'babylog', STORE = 'events';
+let db;
+
+function open(){
+  return new Promise((res, rej) => {
+    const r = indexedDB.open(DB, 1);
+    r.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains(STORE)) {
+        const s = d.createObjectStore(STORE, { keyPath: 'id' });
+        s.createIndex('ts', 'ts');
+      }
+    };
+    r.onsuccess = e => res(e.target.result);
+    r.onerror = () => rej(r.error);
+  });
+}
+function tx(mode){ return db.transaction(STORE, mode).objectStore(STORE); }
+function put(rec){
+  return new Promise((res, rej) => { const q = tx('readwrite').put(rec); q.onsuccess = res; q.onerror = () => rej(q.error); });
+}
+function del(id){
+  return new Promise((res, rej) => { const q = tx('readwrite').delete(id); q.onsuccess = res; q.onerror = () => rej(q.error); });
+}
+function all(){
+  return new Promise((res, rej) => { const q = tx('readonly').getAll(); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); });
+}
+
+/* ---------- model ---------- */
+const uid = () => (crypto.randomUUID ? crypto.randomUUID()
+  : Date.now().toString(36) + Math.random().toString(36).slice(2, 10));
+
+function blank(type){
+  const n = Date.now();
+  return { id: uid(), type, ts: n, end_ts: null, method: type === 'feed' ? 'bottle' : null,
+    side: null, amount_ml: null, duration_min: null, kg: null, nappy: type === 'nappy' ? 'wet' : null,
+    notes: '', created_at: n, updated_at: n, v: 1 };
+}
+
+let events = [];
+async function reload(){
+  events = (await all()).sort((a, b) => b.ts - a.ts);
+  render();
+}
+
+/* ---------- formatting ---------- */
+const pad = n => String(n).padStart(2, '0');
+const hhmm = ms => { const d = new Date(ms); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+function dur(ms){
+  const m = Math.max(0, Math.floor(ms / 60000));
+  return Math.floor(m / 60) + ':' + pad(m % 60);
+}
+function dayKey(ms){ const d = new Date(ms); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+function dayLabel(ms){
+  const t = dayKey(Date.now()), y = dayKey(Date.now() - 864e5), k = dayKey(ms);
+  if (k === t) return 'today';
+  if (k === y) return 'yesterday';
+  return new Date(ms).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }).toLowerCase();
+}
+function describe(e){
+  if (e.type === 'feed') {
+    if (e.method === 'breast') {
+      const s = { L: 'left', R: 'right', both: 'both sides' }[e.side] || '';
+      return 'Breast' + (s ? ' · ' + s : '') + (e.duration_min ? ' · ' + e.duration_min + ' min' : '');
+    }
+    return 'Bottle' + (e.amount_ml ? ' · ' + e.amount_ml + ' ml' : '');
+  }
+  if (e.type === 'nappy') return { wet: 'Nappy · wet', dirty: 'Nappy · dirty', both: 'Nappy · wet + dirty' }[e.nappy] || 'Nappy';
+  if (e.type === 'pump') return 'Pumped' + (e.amount_ml ? ' · ' + e.amount_ml + ' ml' : '') +
+    (e.side && e.side !== 'both' ? ' · ' + (e.side === 'L' ? 'left' : 'right') : '');
+  if (e.type === 'sleep') return e.end_ts ? 'Slept · ' + dur(e.end_ts - e.ts) : 'Asleep — still going';
+  if (e.type === 'weight') return 'Weighed · ' + (e.kg != null ? e.kg.toFixed(2) + ' kg' : '—');
+  return e.type;
+}
+
+/* ---------- render ---------- */
+const $ = id => document.getElementById(id);
+
+function render(){
+  const today = dayKey(Date.now());
+  const td = events.filter(e => dayKey(e.ts) === today);
+  $('tFeeds').textContent = td.filter(e => e.type === 'feed').length;
+  $('tBottle').textContent = td.filter(e => e.type === 'feed' && e.method === 'bottle')
+    .reduce((s, e) => s + (e.amount_ml || 0), 0);
+  $('tNappy').textContent = td.filter(e => e.type === 'nappy').length;
+  $('tPump').textContent = td.filter(e => e.type === 'pump').reduce((s, e) => s + (e.amount_ml || 0), 0);
+
+  const weights = events.filter(e => e.type === 'weight' && e.kg != null);
+  if (weights.length) {
+    const [now, prev] = weights;
+    $('wKg').textContent = now.kg.toFixed(2) + ' kg';
+    const days = Math.round((Date.now() - now.ts) / 864e5);
+    const when = days === 0 ? 'today' : days === 1 ? 'yesterday' : days + ' days ago';
+    if (prev) {
+      const g = Math.round((now.kg - prev.kg) * 1000);
+      const span = Math.max(1, Math.round((now.ts - prev.ts) / 864e5));
+      $('wMeta').innerHTML = '<b>' + (g >= 0 ? '+' : '') + g + ' g</b> over ' + span + 'd · ' + when;
+    } else {
+      $('wMeta').textContent = when;
+    }
+  } else {
+    $('wKg').textContent = '— kg';
+    $('wMeta').textContent = 'tap to log';
+  }
+
+  const log = $('log');
+  log.innerHTML = '';
+  if (!events.length) {
+    log.innerHTML = '<p class="empty">Nothing logged yet. Tap Feed below to start.</p>';
+  } else {
+    let cur = null;
+    for (const e of events.slice(0, 300)) {
+      const k = dayKey(e.ts);
+      if (k !== cur) {
+        cur = k;
+        const h = document.createElement('div');
+        h.className = 'daymark'; h.textContent = dayLabel(e.ts);
+        log.appendChild(h);
+      }
+      const b = document.createElement('button');
+      b.className = 'row ' + e.type;
+      b.innerHTML = '<span class="t"></span><span class="bar"></span><span class="d"></span>';
+      b.querySelector('.t').textContent = hhmm(e.ts);
+      const d = b.querySelector('.d');
+      d.textContent = describe(e);
+      if (e.notes) { const n = document.createElement('span'); n.className = 'n'; n.textContent = e.notes; d.appendChild(n); }
+      b.onclick = () => openSheet(e.type, e);
+      log.appendChild(b);
+    }
+  }
+  tick();
+}
+
+function tick(){
+  const lastFeed = events.find(e => e.type === 'feed');
+  const c = $('clock');
+  if (lastFeed) {
+    const gap = Date.now() - lastFeed.ts;
+    c.textContent = dur(gap);
+    c.className = 'clock ' + (gap > 3 * 36e5 ? 'late' : gap > 9e5 ? 'warm' : '');
+    $('lastfeed').textContent = describe(lastFeed).toLowerCase() + ' at ' + hhmm(lastFeed.ts);
+  } else {
+    c.textContent = '—:—'; c.className = 'clock';
+    $('lastfeed').textContent = 'nothing logged yet';
+  }
+  const nap = events.find(e => e.type === 'sleep' && !e.end_ts);
+  $('activeSleep').classList.toggle('on', !!nap);
+  $('sleepBtn').classList.toggle('hide', false);
+  if (nap) $('sleepDur').textContent = dur(Date.now() - nap.ts);
+}
+setInterval(tick, 10000);
+
+/* ---------- sheet ---------- */
+let draft = null, editing = false;
+
+function setGroup(group, val){
+  document.querySelectorAll('[data-group="' + group + '"] .chip').forEach(c => {
+    c.setAttribute('aria-pressed', String(c.dataset.val === val));
+  });
+}
+function getGroup(group){
+  const on = document.querySelector('[data-group="' + group + '"] .chip[aria-pressed="true"]');
+  return on ? on.dataset.val : null;
+}
+document.querySelectorAll('.chips').forEach(g => {
+  g.onclick = ev => {
+    const c = ev.target.closest('.chip'); if (!c) return;
+    setGroup(g.dataset.group, c.dataset.val);
+    if (g.dataset.group === 'method') shapeSheet();
+  };
+});
+
+function shapeSheet(){
+  const t = draft.type, method = getGroup('method');
+  $('fMethod').classList.toggle('hide', t !== 'feed');
+  $('fNappy').classList.toggle('hide', t !== 'nappy');
+  $('fSide').classList.toggle('hide', !(t === 'pump' || (t === 'feed' && method === 'breast')));
+  $('fAmount').classList.toggle('hide', !(t === 'pump' || (t === 'feed' && method === 'bottle')));
+  $('fMins').classList.toggle('hide', !(t === 'feed' && method === 'breast'));
+  $('fKg').classList.toggle('hide', t !== 'weight');
+  $('fDate').classList.toggle('hide', t !== 'weight');
+  $('fTime').classList.toggle('hide', t === 'weight');
+  $('timeLabel').textContent = t === 'sleep' ? 'Fell asleep' : 'Time';
+}
+
+function openSheet(type, rec){
+  editing = !!rec;
+  draft = rec ? Object.assign({}, rec) : blank(type);
+  $('sheetTitle').textContent = (editing ? 'Edit ' : '') +
+    { feed: 'Feed', nappy: 'Nappy', pump: 'Pump', sleep: 'Sleep', weight: 'Weight' }[draft.type];
+  setGroup('method', draft.method); setGroup('side', draft.side); setGroup('nappy', draft.nappy);
+  $('amount').value = draft.amount_ml ?? '';
+  $('mins').value = draft.duration_min ?? '';
+  $('kg').value = draft.kg ?? '';
+  $('notes').value = draft.notes || '';
+  $('time').value = hhmm(draft.ts);
+  $('date').value = dayKey(draft.ts);
+  $('delBtn').classList.toggle('hide', !editing);
+  shapeSheet();
+  $('scrim').classList.add('on'); $('sheet').classList.add('on');
+}
+function closeSheet(){
+  $('scrim').classList.remove('on'); $('sheet').classList.remove('on'); draft = null;
+}
+$('scrim').onclick = closeSheet;
+
+document.querySelectorAll('.nudge').forEach(b => {
+  b.onclick = () => {
+    const [h, m] = $('time').value.split(':').map(Number);
+    const d = new Date(); d.setHours(h, m + Number(b.dataset.nudge), 0, 0);
+    $('time').value = pad(d.getHours()) + ':' + pad(d.getMinutes());
+  };
+});
+
+$('saveBtn').onclick = async () => {
+  if (draft.type === 'weight') {
+    if ($('kg').value === '') return toast('Enter a weight first');
+    const [Y, M, D] = ($('date').value || dayKey(Date.now())).split('-').map(Number);
+    const d = new Date(draft.ts); d.setFullYear(Y, M - 1, D);
+    draft.ts = d.getTime();
+    draft.kg = Number($('kg').value);
+  } else {
+    const [h, m] = ($('time').value || hhmm(Date.now())).split(':').map(Number);
+    const base = new Date(draft.ts); base.setHours(h, m, 0, 0);
+    let ts = base.getTime();
+    // a time later than now on a fresh entry means it was yesterday
+    if (!editing && ts > Date.now() + 60000) ts -= 864e5;
+    draft.ts = ts;
+    draft.kg = null;
+  }
+
+  draft.method = draft.type === 'feed' ? getGroup('method') : null;
+  draft.nappy = draft.type === 'nappy' ? getGroup('nappy') : null;
+  draft.side = (draft.type === 'pump' || (draft.type === 'feed' && draft.method === 'breast')) ? getGroup('side') : null;
+  draft.amount_ml = $('amount').value === '' ? null : Number($('amount').value);
+  draft.duration_min = $('mins').value === '' ? null : Number($('mins').value);
+  draft.notes = $('notes').value.trim();
+  draft.updated_at = Date.now();
+
+  await put(draft);
+  closeSheet(); await reload();
+  toast(editing ? 'Updated' : 'Logged');
+  if (navigator.vibrate) navigator.vibrate(12);
+};
+
+$('delBtn').onclick = async () => {
+  await del(draft.id); closeSheet(); await reload(); toast('Deleted');
+};
+
+/* ---------- quick actions ---------- */
+document.querySelectorAll('[data-new]').forEach(b => {
+  b.onclick = async () => {
+    const t = b.dataset.new;
+    if (t === 'sleep') {
+      const nap = events.find(e => e.type === 'sleep' && !e.end_ts);
+      if (nap) return wake();
+      const rec = blank('sleep');
+      await put(rec); await reload(); toast('Sleep started');
+      if (navigator.vibrate) navigator.vibrate(12);
+      return;
+    }
+    openSheet(t);
+  };
+});
+async function wake(){
+  const nap = events.find(e => e.type === 'sleep' && !e.end_ts);
+  if (!nap) return;
+  nap.end_ts = Date.now(); nap.duration_min = Math.round((nap.end_ts - nap.ts) / 60000);
+  nap.updated_at = Date.now();
+  await put(nap); await reload(); toast('Slept ' + dur(nap.end_ts - nap.ts));
+}
+$('wakeBtn').onclick = wake;
+$('weightStrip').onclick = () => openSheet('weight');
+
+/* ---------- export / import ---------- */
+$('exportBtn').onclick = async () => {
+  const data = { app: 'babylog', v: 1, exported_at: new Date().toISOString(), events: await all() };
+  const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+  const a = document.createElement('a');
+  a.href = url; a.download = 'babylog-' + dayKey(Date.now()) + '.json';
+  a.click(); URL.revokeObjectURL(url);
+};
+$('importFile').onchange = async ev => {
+  const f = ev.target.files[0]; if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    const list = Array.isArray(data) ? data : data.events;
+    if (!Array.isArray(list)) throw new Error('no events array');
+    for (const e of list) if (e && e.id && e.ts) await put(e);
+    await reload(); toast('Imported ' + list.length);
+  } catch (err) {
+    toast("That file isn't a Log export");
+  }
+  ev.target.value = '';
+};
+
+let toastT;
+function toast(msg){
+  const t = $('toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 1800);
+}
+
+/* ---------- boot ---------- */
+(async () => {
+  db = await open();
+  if (navigator.storage && navigator.storage.persist) {
+    const already = await navigator.storage.persisted();
+    if (!already) await navigator.storage.persist();
+  }
+  await reload();
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+})();
+document.addEventListener('visibilitychange', () => { if (!document.hidden) reload(); });
+</script>
+</body>
+</html>
