@@ -12,7 +12,7 @@
   --ink:#0E1114; --panel:#171B20; --panel-2:#1E242B; --line:#2A313A;
   --text:#E8E2D6; --dim:#868D96; --dimmer:#5B626B;
   --amber:#E9A23B; --moss:#7FA06B; --slate:#6E8AA8; --violet:#9483B4; --sea:#6FA39C;
-  --sheet-h: 0px;
+  --rose:#C08497;
   --mono: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
 }
@@ -26,60 +26,51 @@ body{
 }
 button{font:inherit; color:inherit; background:none; border:none; cursor:pointer}
 :focus-visible{outline:2px solid var(--amber); outline-offset:2px}
+.hide{display:none !important}
 
-/* ---- hero: time since last feed ---- */
-.hero{
-  padding:calc(20px + env(safe-area-inset-top)) 20px 18px;
-  border-bottom:1px solid var(--line);
+/* ---- tabs ---- */
+.tabs{
+  display:flex; gap:0; border-bottom:1px solid var(--line);
+  padding-top:env(safe-area-inset-top); background:var(--ink);
+  position:sticky; top:0; z-index:5;
 }
-.hero .eyebrow{
-  font-size:11px; letter-spacing:.16em; text-transform:uppercase;
-  color:var(--dimmer); font-family:var(--mono);
+.tabs button{
+  flex:1; padding:15px 4px 12px; font-size:13px; color:var(--dimmer);
+  font-family:var(--mono); letter-spacing:.08em;
+  border-bottom:2px solid transparent; margin-bottom:-1px;
 }
+.tabs button[aria-selected="true"]{color:var(--text); border-bottom-color:var(--amber)}
+
+/* ---- hero ---- */
+.hero{padding:20px 20px 18px; border-bottom:1px solid var(--line)}
+.hero .eyebrow{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--dimmer); font-family:var(--mono)}
 .hero .clock{
   font-family:var(--mono); font-size:64px; line-height:1; font-weight:500;
   font-variant-numeric:tabular-nums; letter-spacing:-.03em;
-  margin:6px 0 4px; color:var(--dim);
-  transition:color .6s ease;
+  margin:6px 0 4px; color:var(--dim); transition:color .6s ease;
 }
 .hero .clock.warm{color:var(--text)}
 .hero .clock.late{color:var(--amber)}
 .hero .last{font-size:13px; color:var(--dimmer); font-family:var(--mono)}
 
-/* ---- active sleep banner ---- */
-.active{
-  display:none; align-items:center; gap:12px;
-  margin:0; padding:14px 20px;
-  background:var(--panel); border-bottom:1px solid var(--line);
-}
+.active{display:none; align-items:center; gap:12px; padding:14px 20px; background:var(--panel); border-bottom:1px solid var(--line)}
 .active.on{display:flex}
-.active .pip{width:8px; height:8px; border-radius:50%; background:var(--violet); flex:none}
+.active .pip{width:8px; height:8px; border-radius:50%; flex:none}
+.active.sleep .pip{background:var(--violet)}
+.active.settle .pip{background:var(--rose)}
 .active .txt{flex:1; font-size:14px; font-family:var(--mono); color:var(--dim)}
 .active .txt b{color:var(--text); font-weight:500}
-.active button{
-  padding:8px 16px; border:1px solid var(--line); border-radius:999px;
-  font-size:14px; color:var(--text);
-}
+.active button{padding:8px 16px; border:1px solid var(--line); border-radius:999px; font-size:14px; color:var(--text)}
 
-/* ---- today totals ---- */
-.totals{
-  display:flex; gap:0; padding:14px 20px; border-bottom:1px solid var(--line);
-  font-family:var(--mono); font-size:12px;
-}
+.totals{display:flex; padding:14px 20px; border-bottom:1px solid var(--line); font-family:var(--mono); font-size:12px}
 .totals div{flex:1}
 .totals .k{color:var(--dimmer); display:block; font-size:10px; letter-spacing:.1em; text-transform:uppercase}
 .totals .v{color:var(--text); font-size:17px; font-variant-numeric:tabular-nums}
 
-/* ---- log ---- */
+/* ---- log rows ---- */
 .log{padding:8px 0 20px}
-.daymark{
-  padding:18px 20px 6px; font-family:var(--mono); font-size:11px;
-  letter-spacing:.14em; text-transform:uppercase; color:var(--dimmer);
-}
-.row{
-  display:flex; align-items:baseline; gap:12px; width:100%;
-  padding:12px 20px; text-align:left; border-bottom:1px solid #1A1F25;
-}
+.daymark{padding:18px 20px 6px; font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--dimmer)}
+.row{display:flex; align-items:baseline; gap:12px; width:100%; padding:12px 20px; text-align:left; border-bottom:1px solid #1A1F25}
 .row:active{background:var(--panel)}
 .row .t{font-family:var(--mono); font-size:14px; color:var(--dim); font-variant-numeric:tabular-nums; flex:none}
 .row .bar{width:3px; align-self:stretch; border-radius:2px; flex:none}
@@ -87,46 +78,50 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
 .row .n{display:block; font-size:13px; color:var(--dimmer); margin-top:2px}
 .feed .bar{background:var(--amber)} .nappy .bar{background:var(--moss)}
 .pump .bar{background:var(--slate)} .sleep .bar{background:var(--violet)}
-.weight .bar{background:var(--sea)}
+.weight .bar{background:var(--sea)} .settle .bar{background:var(--rose)}
 
-/* ---- weight strip ---- */
-.weight-strip{
-  display:flex; align-items:baseline; gap:12px; width:100%; text-align:left;
-  padding:14px 20px; border-bottom:1px solid var(--line); font-family:var(--mono);
-}
+.weight-strip{display:flex; align-items:baseline; gap:12px; width:100%; text-align:left; padding:14px 20px; border-bottom:1px solid var(--line); font-family:var(--mono)}
 .weight-strip:active{background:var(--panel)}
-.weight-strip .k{
-  font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--dimmer); flex:none;
-}
+.weight-strip .k{font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--dimmer); flex:none}
 .weight-strip .kg{font-size:17px; color:var(--text); font-variant-numeric:tabular-nums}
 .weight-strip .meta{flex:1; text-align:right; font-size:12px; color:var(--dimmer)}
 .weight-strip .meta b{color:var(--sea); font-weight:500}
-
 .empty{padding:48px 20px; color:var(--dimmer); font-size:15px}
 
-/* ---- bottom action bar ---- */
-.bar-actions{
-  position:fixed; left:0; right:0; bottom:0; display:flex; gap:1px;
-  background:var(--line); border-top:1px solid var(--line);
-  padding-bottom:env(safe-area-inset-bottom);
-}
-.bar-actions button{
-  flex:1; background:var(--ink); padding:20px 4px 18px;
-  font-size:14px; font-weight:500;
-}
+/* ---- panels / cards ---- */
+.pane{padding:4px 0 24px}
+.card{margin:14px 20px; padding:16px; background:var(--panel); border:1px solid var(--line); border-radius:14px}
+.card h3{margin:0 0 4px; font-size:15px; font-weight:600}
+.card .sub{font-size:13px; color:var(--dimmer); font-family:var(--mono)}
+.card .big{font-family:var(--mono); font-size:32px; font-variant-numeric:tabular-nums; margin:8px 0 2px; letter-spacing:-.02em}
+.stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px 12px; margin-top:14px}
+.stat .k{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--dimmer); margin-bottom:3px}
+.stat .v{font-family:var(--mono); font-size:19px; font-variant-numeric:tabular-nums}
+.stat .v small{font-size:12px; color:var(--dim)}
+.seg{display:flex; gap:6px; margin:0 20px 4px}
+.seg button{flex:1; padding:9px; border:1px solid var(--line); border-radius:9px; font-family:var(--mono); font-size:12px; color:var(--dim)}
+.seg button[aria-pressed="true"]{background:var(--text); color:var(--ink); border-color:var(--text)}
+.note{margin:14px 20px; padding:14px 16px; border:1px solid var(--line); border-left:3px solid var(--amber); border-radius:0 12px 12px 0; background:var(--panel); font-size:14px; color:var(--dim)}
+.note b{color:var(--text); font-weight:600; display:block; margin-bottom:5px; font-size:14px}
+.note a{color:var(--amber); text-decoration:none; border-bottom:1px solid rgba(233,162,59,.35); display:inline-block; margin-top:8px; font-size:13px}
+.note.calm{border-left-color:var(--sea)} .note.calm a{color:var(--sea); border-bottom-color:rgba(111,163,156,.35)}
+.legend{display:flex; flex-wrap:wrap; gap:12px; padding:0 20px 8px; font-family:var(--mono); font-size:11px; color:var(--dimmer)}
+.legend i{display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:5px; vertical-align:-1px}
+svg{display:block; width:100%; height:auto; overflow:visible}
+.swim{margin:0 20px}
+
+/* ---- bottom bar ---- */
+.bar-actions{position:fixed; left:0; right:0; bottom:0; display:flex; gap:1px; background:var(--line); border-top:1px solid var(--line); padding-bottom:env(safe-area-inset-bottom); z-index:6}
+.bar-actions button{flex:1; background:var(--ink); padding:20px 2px 18px; font-size:13px; font-weight:500}
 .bar-actions button:active{background:var(--panel)}
 .bar-actions .ic{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.1em; color:var(--dimmer); margin-bottom:4px}
 
 /* ---- sheet ---- */
-.scrim{
-  position:fixed; inset:0; background:rgba(5,7,9,.72);
-  opacity:0; pointer-events:none; transition:opacity .18s ease; z-index:10;
-}
+.scrim{position:fixed; inset:0; background:rgba(5,7,9,.72); opacity:0; pointer-events:none; transition:opacity .18s ease; z-index:10}
 .scrim.on{opacity:1; pointer-events:auto}
 .sheet{
   position:fixed; left:0; right:0; bottom:0; z-index:11;
-  background:var(--panel); border-top:1px solid var(--line);
-  border-radius:18px 18px 0 0;
+  background:var(--panel); border-top:1px solid var(--line); border-radius:18px 18px 0 0;
   padding:8px 20px calc(24px + env(safe-area-inset-bottom));
   transform:translateY(101%); transition:transform .22s cubic-bezier(.2,.8,.3,1);
   max-height:88vh; overflow-y:auto;
@@ -135,96 +130,81 @@ button{font:inherit; color:inherit; background:none; border:none; cursor:pointer
 .grab{width:36px; height:4px; border-radius:2px; background:var(--line); margin:6px auto 16px}
 .sheet h2{margin:0 0 18px; font-size:19px; font-weight:600}
 .field{margin-bottom:18px}
-.field > label{
-  display:block; font-family:var(--mono); font-size:10px; letter-spacing:.14em;
-  text-transform:uppercase; color:var(--dimmer); margin-bottom:8px;
-}
+.field > label{display:block; font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--dimmer); margin-bottom:8px}
 .chips{display:flex; gap:8px; flex-wrap:wrap}
-.chip{
-  padding:11px 16px; border:1px solid var(--line); border-radius:10px;
-  background:var(--panel-2); font-size:15px; color:var(--dim);
-}
+.chip{padding:11px 16px; border:1px solid var(--line); border-radius:10px; background:var(--panel-2); font-size:15px; color:var(--dim)}
 .chip[aria-pressed="true"]{background:var(--text); color:var(--ink); border-color:var(--text); font-weight:500}
 input[type="number"], input[type="time"], input[type="date"], input[type="text"]{
-  width:100%; padding:13px 14px; background:var(--panel-2);
-  border:1px solid var(--line); border-radius:10px; color:var(--text);
-  font-size:16px; font-family:var(--mono);
+  width:100%; padding:13px 14px; background:var(--panel-2); border:1px solid var(--line);
+  border-radius:10px; color:var(--text); font-size:16px; font-family:var(--mono);
 }
 .timerow{display:flex; gap:8px; align-items:center}
 .timerow input[type="time"]{flex:1}
-.nudge{
-  padding:13px 12px; border:1px solid var(--line); border-radius:10px;
-  background:var(--panel-2); font-family:var(--mono); font-size:14px; color:var(--dim);
-}
+.nudge{padding:13px 12px; border:1px solid var(--line); border-radius:10px; background:var(--panel-2); font-family:var(--mono); font-size:14px; color:var(--dim)}
 .sheet-actions{display:flex; gap:10px; margin-top:22px}
-.save{
-  flex:1; padding:16px; border-radius:12px; background:var(--text); color:var(--ink);
-  font-size:16px; font-weight:600;
-}
+.save{flex:1; padding:16px; border-radius:12px; background:var(--text); color:var(--ink); font-size:16px; font-weight:600}
 .del{padding:16px 18px; border:1px solid var(--line); border-radius:12px; color:var(--amber); font-size:15px}
-.hide{display:none !important}
-
-/* ---- data footer ---- */
-.data{
-  display:flex; gap:10px; padding:24px 20px 40px; border-top:1px solid var(--line);
-  margin-top:12px;
-}
-.data button, .data label{
-  flex:1; text-align:center; padding:13px; border:1px solid var(--line);
-  border-radius:10px; font-size:14px; color:var(--dim); cursor:pointer;
-}
-.toast{
-  position:fixed; left:50%; bottom:100px; transform:translateX(-50%) translateY(8px);
-  background:var(--panel-2); border:1px solid var(--line); color:var(--text);
-  padding:11px 18px; border-radius:999px; font-size:14px; z-index:20;
-  opacity:0; pointer-events:none; transition:opacity .2s, transform .2s;
-}
+.data{display:flex; gap:10px; padding:24px 20px 40px; border-top:1px solid var(--line); margin-top:12px}
+.data button, .data label{flex:1; text-align:center; padding:13px; border:1px solid var(--line); border-radius:10px; font-size:14px; color:var(--dim); cursor:pointer}
+.toast{position:fixed; left:50%; bottom:100px; transform:translateX(-50%) translateY(8px); background:var(--panel-2); border:1px solid var(--line); color:var(--text); padding:11px 18px; border-radius:999px; font-size:14px; z-index:20; opacity:0; pointer-events:none; transition:opacity .2s, transform .2s}
 .toast.on{opacity:1; transform:translateX(-50%) translateY(0)}
-
-@media (prefers-reduced-motion: reduce){
-  *{transition:none !important; animation:none !important}
-}
+@media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important} }
 </style>
 </head>
 <body>
 
-<header class="hero">
-  <span class="eyebrow">since last feed</span>
-  <div class="clock" id="clock">—:—</div>
-  <div class="last" id="lastfeed">nothing logged yet</div>
-</header>
+<nav class="tabs" role="tablist">
+  <button role="tab" data-tab="now" aria-selected="true">now</button>
+  <button role="tab" data-tab="day" aria-selected="false">day</button>
+  <button role="tab" data-tab="trends" aria-selected="false">trends</button>
+  <button role="tab" data-tab="growth" aria-selected="false">growth</button>
+</nav>
 
-<div class="active" id="activeSleep">
-  <span class="pip"></span>
-  <span class="txt">asleep <b id="sleepDur">0:00</b></span>
-  <button id="wakeBtn">Awake</button>
+<div id="tab-now">
+  <header class="hero">
+    <span class="eyebrow">since last feed</span>
+    <div class="clock" id="clock">—:—</div>
+    <div class="last" id="lastfeed">nothing logged yet</div>
+  </header>
+  <div class="active" id="activeSleep">
+    <span class="pip"></span>
+    <span class="txt">asleep <b id="sleepDur">0:00</b></span>
+    <button id="wakeBtn">Awake</button>
+  </div>
+  <div class="active settle" id="activeSettle">
+    <span class="pip"></span>
+    <span class="txt">settling <b id="settleDur">0:00</b> · <span id="settleWho">—</span></span>
+    <button id="calmBtn">Calm</button>
+  </div>
+  <section class="totals" aria-label="Today">
+    <div><span class="k">feeds</span><span class="v" id="tFeeds">0</span></div>
+    <div><span class="k">bottle</span><span class="v" id="tBottle">0</span></div>
+    <div><span class="k">nappies</span><span class="v" id="tNappy">0</span></div>
+    <div><span class="k">pumped</span><span class="v" id="tPump">0</span></div>
+  </section>
+  <div id="nowNotes"></div>
+  <button class="weight-strip" id="weightStrip">
+    <span class="k">weight</span>
+    <span class="kg" id="wKg">— kg</span>
+    <span class="meta" id="wMeta">tap to log</span>
+  </button>
+  <main class="log" id="log"></main>
+  <div class="data">
+    <button id="exportBtn">Export JSON</button>
+    <label>Import<input type="file" id="importFile" accept="application/json" hidden></label>
+  </div>
 </div>
 
-<section class="totals" id="totals" aria-label="Today">
-  <div><span class="k">feeds</span><span class="v" id="tFeeds">0</span></div>
-  <div><span class="k">bottle</span><span class="v" id="tBottle">0</span></div>
-  <div><span class="k">nappies</span><span class="v" id="tNappy">0</span></div>
-  <div><span class="k">pumped</span><span class="v" id="tPump">0</span></div>
-</section>
-
-<button class="weight-strip" id="weightStrip">
-  <span class="k">weight</span>
-  <span class="kg" id="wKg">— kg</span>
-  <span class="meta" id="wMeta">tap to log</span>
-</button>
-
-<main class="log" id="log"></main>
-
-<div class="data">
-  <button id="exportBtn">Export JSON</button>
-  <label>Import<input type="file" id="importFile" accept="application/json" hidden></label>
-</div>
+<div id="tab-day" class="pane hide"></div>
+<div id="tab-trends" class="pane hide"></div>
+<div id="tab-growth" class="pane hide"></div>
 
 <nav class="bar-actions">
   <button data-new="feed"><span class="ic">01</span>Feed</button>
   <button data-new="nappy"><span class="ic">02</span>Nappy</button>
   <button data-new="pump"><span class="ic">03</span>Pump</button>
   <button data-new="sleep" id="sleepBtn"><span class="ic">04</span>Sleep</button>
+  <button data-new="settle" id="settleBtn"><span class="ic">05</span>Settle</button>
 </nav>
 
 <div class="scrim" id="scrim"></div>
@@ -235,11 +215,10 @@ input[type="number"], input[type="time"], input[type="date"], input[type="text"]
   <div class="field" id="fMethod">
     <label>Method</label>
     <div class="chips" data-group="method">
-      <button class="chip" data-val="breast">Breast</button>
       <button class="chip" data-val="bottle">Bottle</button>
+      <button class="chip" data-val="breast">Breast</button>
     </div>
   </div>
-
   <div class="field" id="fSide">
     <label>Side</label>
     <div class="chips" data-group="side">
@@ -248,374 +227,1002 @@ input[type="number"], input[type="time"], input[type="date"], input[type="text"]
       <button class="chip" data-val="both">Both</button>
     </div>
   </div>
-
   <div class="field" id="fNappy">
-    <label>Type</label>
+    <label>Contents</label>
     <div class="chips" data-group="nappy">
       <button class="chip" data-val="wet">Wet</button>
       <button class="chip" data-val="dirty">Dirty</button>
       <button class="chip" data-val="both">Both</button>
     </div>
   </div>
-
   <div class="field" id="fAmount">
     <label id="amountLabel">Amount (ml)</label>
     <input type="number" id="amount" inputmode="numeric" step="5" min="0" placeholder="60">
   </div>
-
   <div class="field" id="fMins">
     <label>Duration (min)</label>
     <input type="number" id="mins" inputmode="numeric" step="1" min="0" placeholder="15">
   </div>
-
   <div class="field" id="fKg">
     <label>Weight (kg)</label>
     <input type="number" id="kg" inputmode="decimal" step="0.01" min="0" placeholder="4.70">
+  </div>
+
+  <!-- settling fields -->
+  <div class="field" id="fHandler">
+    <label>Who is holding her</label>
+    <div class="chips" data-group="handler">
+      <button class="chip" data-val="dom">Dom</button>
+      <button class="chip" data-val="wife">Wife</button>
+      <button class="chip" data-val="sil">Sister-in-law</button>
+    </div>
+  </div>
+  <div class="field" id="fStart">
+    <label>State when picked up</label>
+    <div class="chips" data-group="startState">
+      <button class="chip" data-val="0">Grizzling</button>
+      <button class="chip" data-val="1">Crying</button>
+      <button class="chip" data-val="2">Full scream</button>
+    </div>
+  </div>
+  <div class="field" id="fTakeover">
+    <label>First go, or taking over</label>
+    <div class="chips" data-group="takeover">
+      <button class="chip" data-val="first">First go</button>
+      <button class="chip" data-val="second">Taking over</button>
+    </div>
+  </div>
+  <div class="field" id="fMove">
+    <label>Movement</label>
+    <div class="chips" data-group="movement">
+      <button class="chip" data-val="walk">Walking</button>
+      <button class="chip" data-val="ball">Ball</button>
+      <button class="chip" data-val="sway">Swaying</button>
+      <button class="chip" data-val="still">Still</button>
+    </div>
+  </div>
+  <div class="field" id="fSwaddle">
+    <label>Swaddle</label>
+    <div class="chips" data-group="swaddle">
+      <button class="chip" data-val="in">Arms in</button>
+      <button class="chip" data-val="out">Arms out</button>
+      <button class="chip" data-val="none">None</button>
+    </div>
+  </div>
+  <div class="field" id="fSkin">
+    <label>Contact</label>
+    <div class="chips" data-group="skin">
+      <button class="chip" data-val="skin">Skin to skin</button>
+      <button class="chip" data-val="clothes">Through clothes</button>
+    </div>
+  </div>
+  <div class="field" id="fSound">
+    <label>Sound</label>
+    <div class="chips" data-group="sound">
+      <button class="chip" data-val="shush">Shush</button>
+      <button class="chip" data-val="hum">Hum</button>
+      <button class="chip" data-val="white">White noise</button>
+      <button class="chip" data-val="quiet">Quiet</button>
+    </div>
+  </div>
+  <div class="field" id="fChanges">
+    <label>Technique changes during</label>
+    <div class="chips" data-group="changes">
+      <button class="chip" data-val="0">0</button>
+      <button class="chip" data-val="1">1</button>
+      <button class="chip" data-val="2">2</button>
+      <button class="chip" data-val="3">3+</button>
+    </div>
+  </div>
+  <div class="field" id="fOutcome">
+    <label>Outcome</label>
+    <div class="chips" data-group="outcome">
+      <button class="chip" data-val="calm">Calmed</button>
+      <button class="chip" data-val="asleep">Fell asleep</button>
+      <button class="chip" data-val="handed">Handed over</button>
+    </div>
   </div>
 
   <div class="field" id="fDate">
     <label>Date</label>
     <input type="date" id="date">
   </div>
-
   <div class="field" id="fTime">
     <label id="timeLabel">Time</label>
     <div class="timerow">
       <input type="time" id="time">
-      <button class="nudge" data-nudge="-5">−5</button>
-      <button class="nudge" data-nudge="-15">−15</button>
-      <button class="nudge" data-nudge="-30">−30</button>
+      <button class="nudge" data-nudge="-5">−5m</button>
+      <button class="nudge" data-nudge="-15">−15m</button>
     </div>
   </div>
-
   <div class="field">
     <label>Notes</label>
     <input type="text" id="notes" placeholder="optional">
   </div>
-
   <div class="sheet-actions">
     <button class="save" id="saveBtn">Save</button>
     <button class="del hide" id="delBtn">Delete</button>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script>
-/* ---------- storage ---------- */
-const DB = 'babylog', STORE = 'events';
-let db;
+/* ============================================================
+   Baby log v2
+   Single file. Offline. No server, no network calls at runtime.
+   ============================================================ */
 
-function open(){
+/* ---------- config ---------- */
+const BIRTH = '2026-07-15';          // <-- set Kaia's date of birth
+const SEX   = 'girl';                // WHO table bundled below is girls weight-for-age
+
+/* WHO Child Growth Standards, weight-for-age, girls.
+   [ageDays, L, M, S]. Weeks 0-13 then months 4-24.
+   Source: WHO standard LMS tables. Static — never fetched. */
+const WHO_WFA_GIRLS = [[0,0.3809,3.2322,0.14171],[7,0.2671,3.3388,0.146],[14,0.2304,3.5693,0.14339],[21,0.2024,3.8352,0.1406],[28,0.1789,4.0987,0.13805],[35,0.1582,4.3476,0.13583],[42,0.1395,4.5793,0.13392],[49,0.1224,4.795,0.13228],[56,0.1065,4.9959,0.13087],[63,0.0918,5.1842,0.12966],[70,0.0779,5.3618,0.12861],[77,0.0648,5.5295,0.1277],[84,0.0525,5.6883,0.12691],[91,0.0407,5.8393,0.12622],[122,-0.005,6.4237,0.12402],[152,-0.043,6.8985,0.12274],[183,-0.0756,7.297,0.12204],[213,-0.1039,7.6422,0.12178],[244,-0.1288,7.9487,0.12181],[274,-0.1507,8.2254,0.12199],[304,-0.17,8.48,0.12223],[335,-0.1872,8.7192,0.12247],[365,-0.2024,8.9481,0.12268],[396,-0.2158,9.1699,0.12283],[426,-0.2278,9.387,0.12294],[457,-0.2384,9.6008,0.12299],[487,-0.2478,9.8124,0.12303],[517,-0.2562,10.0226,0.12306],[548,-0.2637,10.2315,0.12309],[578,-0.2703,10.4393,0.12315],[609,-0.2762,10.6464,0.12323],[639,-0.2815,10.8534,0.12335],[670,-0.2862,11.0608,0.1235],[700,-0.2903,11.2688,0.12369],[730,-0.2941,11.4775,0.1239]];
+
+const DAY = 864e5;
+const birthMs = () => new Date(BIRTH + 'T00:00:00').getTime();
+const ageDays = ms => Math.max(0, Math.floor((ms - birthMs()) / DAY));
+
+/* ---------- WHO maths ---------- */
+/* Linear interpolation of L, M, S between table anchors. */
+function lms(days){
+  const t = WHO_WFA_GIRLS;
+  if (days <= t[0][0]) return { L:t[0][1], M:t[0][2], S:t[0][3] };
+  const last = t[t.length-1];
+  if (days >= last[0]) return { L:last[1], M:last[2], S:last[3] };
+  for (let i=1; i<t.length; i++){
+    if (days <= t[i][0]){
+      const a = t[i-1], b = t[i];
+      const f = (days - a[0]) / (b[0] - a[0]);
+      return { L:a[1]+(b[1]-a[1])*f, M:a[2]+(b[2]-a[2])*f, S:a[3]+(b[3]-a[3])*f };
+    }
+  }
+}
+/* z = ((X/M)^L - 1) / (L*S)   — the standard WHO LMS transform. */
+function zScore(kg, days){
+  const { L, M, S } = lms(days);
+  if (Math.abs(L) < 1e-7) return Math.log(kg/M) / S;
+  return (Math.pow(kg/M, L) - 1) / (L * S);
+}
+/* Inverse: the weight at a given z for an age. Used to draw the bands. */
+function kgAtZ(z, days){
+  const { L, M, S } = lms(days);
+  if (Math.abs(L) < 1e-7) return M * Math.exp(S * z);
+  return M * Math.pow(1 + L*S*z, 1/L);
+}
+/* Normal CDF via Abramowitz-Stegun 7.1.26 erf approximation. */
+function pct(z){
+  const s = z < 0 ? -1 : 1, x = Math.abs(z)/Math.SQRT2;
+  const t = 1/(1+0.3275911*x);
+  const y = 1 - (((((1.061405429*t - 1.453152027)*t) + 1.421413741)*t - 0.284496736)*t + 0.254829592)*t*Math.exp(-x*x);
+  return 50*(1 + s*y);
+}
+/* Median daily gain the WHO curve expects across a span. */
+function expectedGainG(d1, d2){
+  return (lms(d2).M - lms(d1).M) * 1000;
+}
+
+/* ---------- time helpers ---------- */
+const pad = n => String(n).padStart(2,'0');
+const hhmm = ms => { const d = new Date(ms); return pad(d.getHours())+':'+pad(d.getMinutes()); };
+function dur(ms){ const m = Math.max(0, Math.floor(ms/60000)); return Math.floor(m/60)+':'+pad(m%60); }
+function dayKey(ms){ const d = new Date(ms); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function startOfDay(ms){ const d = new Date(ms); d.setHours(0,0,0,0); return d.getTime(); }
+function dayLabel(ms){
+  const t = dayKey(Date.now()), y = dayKey(Date.now()-DAY), k = dayKey(ms);
+  if (k===t) return 'today';
+  if (k===y) return 'yesterday';
+  return new Date(ms).toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'}).toLowerCase();
+}
+const ord = n => { const s=['th','st','nd','rd'], v=n%100; return n + (s[(v-20)%10] || s[v] || s[0]); };
+const median = a => { if(!a.length) return null; const s=[...a].sort((x,y)=>x-y), m=s.length>>1;
+  return s.length%2 ? s[m] : (s[m-1]+s[m])/2; };
+
+/* ============================================================
+   ROLLUP — one pure function. Every view reads from this.
+   Nothing below here touches the raw event list directly.
+   ============================================================ */
+function rollup(events, now = Date.now()){
+  const ev = [...events].sort((a,b) => a.ts - b.ts);
+  const byDay = new Map();
+
+  const bucket = k => {
+    if (!byDay.has(k)) byDay.set(k, {
+      key:k, ms:new Date(k+'T00:00:00').getTime(),
+      feeds:[], nappies:[], pumps:[], sleeps:[], settles:[], weight:null,
+      bottleMl:0, breastMin:0, pumpMl:0, wet:0, dirty:0,
+      sleepMin:0, longestSleepMin:0, nightSleepMin:0, dayNaps:0, nightStretches:[]
+    });
+    return byDay.get(k);
+  };
+
+  for (const e of ev){
+    const b = bucket(dayKey(e.ts));
+    const d = e.data || {};
+    if (e.type === 'feed'){
+      b.feeds.push(e);
+      if (d.method === 'bottle') b.bottleMl += d.amount_ml || 0;
+      else b.breastMin += d.duration_min || 0;
+    } else if (e.type === 'nappy'){
+      b.nappies.push(e);
+      if (d.kind === 'wet' || d.kind === 'both') b.wet++;
+      if (d.kind === 'dirty' || d.kind === 'both') b.dirty++;
+    } else if (e.type === 'pump'){
+      b.pumps.push(e); b.pumpMl += d.amount_ml || 0;
+    } else if (e.type === 'weight'){
+      if (d.kg != null) b.weight = d.kg;
+    } else if (e.type === 'settle'){
+      b.settles.push(e);
+    } else if (e.type === 'sleep'){
+      b.sleeps.push(e);
+      const end = e.end_ts || now;
+      const whole = (end - e.ts) / 60000;
+      const startH = new Date(e.ts).getHours();
+      const isNight = startH >= 19 || startH < 7;
+      /* The longest stretch and the nap count belong to the night the sleep
+         STARTED. Splitting a 4am-ending stretch across midnight would halve
+         the one number a tired parent actually cares about. */
+      b.longestSleepMin = Math.max(b.longestSleepMin, whole);
+      if (isNight) b.nightStretches.push(whole); else b.dayNaps++;
+      /* Totals are a different question, so those DO split at midnight. */
+      let cur = e.ts;
+      while (cur < end){
+        const seg = Math.min(end, startOfDay(cur) + DAY);
+        const bb = bucket(dayKey(cur));
+        const mins = (seg - cur) / 60000;
+        bb.sleepMin += mins;
+        if (isNight) bb.nightSleepMin += mins;
+        cur = seg;
+      }
+    }
+  }
+
+  const days = [...byDay.values()].sort((a,b) => a.ms - b.ms);
+  for (const d of days){
+    d.feedCount = d.feeds.length;
+    d.nappyCount = d.nappies.length;
+    d.sleepMin = Math.round(d.sleepMin);
+    d.longestSleepMin = Math.round(d.longestSleepMin);
+    d.nightSleepMin = Math.round(d.nightSleepMin);
+    /* gaps between feed starts, in minutes */
+    const gaps = [];
+    for (let i=1; i<d.feeds.length; i++) gaps.push((d.feeds[i].ts - d.feeds[i-1].ts)/60000);
+    d.medianFeedGapMin = gaps.length ? Math.round(median(gaps)) : null;
+    d.maxFeedGapMin = gaps.length ? Math.round(Math.max(...gaps)) : null;
+    d.longestNightMin = d.nightStretches.length ? Math.round(Math.max(...d.nightStretches)) : 0;
+    /* A day is only comparable to another day if it was actually logged
+       through. Partial edge days would otherwise drag every average down. */
+    d.complete = d.feedCount >= 3;
+  }
+
+  /* ---- weights, with the anti-noise rule baked in ---- */
+  const weights = ev.filter(e => e.type==='weight' && e.data && e.data.kg != null)
+                    .map(e => ({ ts:e.ts, kg:e.data.kg, days:ageDays(e.ts) }));
+  let growth = null;
+  if (weights.length){
+    const latest = weights[weights.length-1];
+    growth = {
+      latest,
+      z: zScore(latest.kg, latest.days),
+      percentile: pct(zScore(latest.kg, latest.days)),
+      series: weights.map(w => ({ ...w, z: zScore(w.kg, w.days), percentile: pct(zScore(w.kg, w.days)) })),
+      gain: null, drift: null
+    };
+    /* Only compute gain from a pair at least 7 days apart. A domestic scale
+       drifts by roughly the same magnitude as a few days of real gain, so
+       anything shorter is measuring the scale, not the baby. */
+    const anchor = [...weights].reverse().find(w => latest.days - w.days >= 7);
+    if (anchor){
+      const spanDays = latest.days - anchor.days;
+      const actualG = (latest.kg - anchor.kg) * 1000;
+      const expectG = expectedGainG(anchor.days, latest.days);
+      growth.gain = {
+        spanDays,
+        actualG: Math.round(actualG),
+        actualPerWeek: Math.round(actualG / spanDays * 7),
+        expectedPerWeek: Math.round(expectG / spanDays * 7),
+        ratio: expectG > 0 ? actualG / expectG : null
+      };
+      growth.drift = zScore(latest.kg, latest.days) - zScore(anchor.kg, anchor.days);
+    }
+  }
+
+  /* ---- live state ---- */
+  const lastFeed  = [...ev].reverse().find(e => e.type === 'feed') || null;
+  const openSleep = ev.find(e => e.type === 'sleep'  && !e.end_ts) || null;
+  const openSettle= ev.find(e => e.type === 'settle' && !e.end_ts) || null;
+  const lastSleepEnd = [...ev].reverse().find(e => e.type==='sleep' && e.end_ts);
+  const awakeMin = (!openSleep && lastSleepEnd) ? Math.round((now - lastSleepEnd.end_ts)/60000) : null;
+
+  /* ---- settling comparison, the whole point of the exercise ---- */
+  const settles = ev.filter(e => e.type==='settle' && e.end_ts);
+  const byHandler = {};
+  for (const s of settles){
+    const h = (s.data && s.data.handler) || 'unknown';
+    (byHandler[h] = byHandler[h] || []).push(Math.round((s.end_ts - s.ts)/60000));
+  }
+  const settling = Object.entries(byHandler).map(([handler, mins]) => ({
+    handler, n:mins.length, median:Math.round(median(mins)), fastest:Math.min(...mins), slowest:Math.max(...mins)
+  })).sort((a,b) => a.median - b.median);
+
+  return { days, growth, settling, settleCount:settles.length,
+           lastFeed, openSleep, openSettle, awakeMin };
+}
+
+/* ---------- rolling window over rollup days ---------- */
+function windowStats(days, n, now = Date.now()){
+  const today = dayKey(now);
+  /* Today is still in progress and empty days are gaps in logging, not
+     zeros. Averaging over either understates everything. */
+  const recent = days.filter(d => d.complete && d.key !== today).slice(-n);
+  const sum = k => recent.reduce((s,d) => s + (d[k]||0), 0);
+  const avg = k => recent.length ? sum(k)/recent.length : 0;
+  return {
+    n: recent.length,
+    feedsPerDay: +avg('feedCount').toFixed(1),
+    bottleMl: Math.round(avg('bottleMl')),
+    breastMin: Math.round(avg('breastMin')),
+    pumpMl: Math.round(avg('pumpMl')),
+    wetPerDay: +avg('wet').toFixed(1),
+    nappiesPerDay: +avg('nappyCount').toFixed(1),
+    sleepMin: Math.round(avg('sleepMin')),
+    longestSleepMin: Math.round(Math.max(0, ...recent.map(d => d.longestSleepMin))),
+    longestNightMin: Math.round(Math.max(0, ...recent.map(d => d.longestNightMin))),
+    nightSleepMin: Math.round(avg('nightSleepMin')),
+    napsPerDay: +avg('dayNaps').toFixed(1)
+  };
+}
+
+/* ============================================================
+   TIPS — bundled, not fetched. Conditions are deliberately
+   conservative: nothing fires off a single measurement, and
+   nothing renders a verdict the Kinderarzt wouldn't act on.
+   Edit the copy and links here; nothing else depends on them.
+   ============================================================ */
+const TIPS = {
+  weightDrift: {
+    title: 'Weight has drifted down the centiles',
+    body: d => `She's moved from about the ${d.fromPct} centile to the ${d.toPct} over ${d.spanDays} days. `
+             + `One drop across a centile band is common and often self-corrects. A sustained slide is the thing `
+             + `paediatricians actually act on, so bring these numbers to the next U-Untersuchung rather than `
+             + `changing anything on your own.`,
+    link: null
+  },
+  weightSlow: {
+    title: 'Gain is below the WHO median',
+    body: d => `${d.actualPerWeek} g/week measured against a median of ${d.expectedPerWeek} g/week, over ${d.spanDays} days. `
+             + `Home scales drift by 50–100 g, which is a real fraction of a week's gain, so weigh at the same time of `
+             + `day on the same scale with the same nappy state before reading much into it. Consistent feeding on `
+             + `demand and counting wet nappies tell you more day-to-day than the number does.`,
+    link: null
+  },
+  awakeLong: {
+    title: 'Awake a while',
+    body: d => `${Math.floor(d.awakeMin/60)}h ${d.awakeMin%60}m since the last sleep ended. At this age wake windows `
+             + `run roughly 45–60 minutes but they're irregular, so this is a clock, not an instruction. `
+             + `If you do want to settle her: five minutes walking, then five to eight minutes sitting still before you put her down.`,
+    link: 'https://www.cell.com/current-biology/fulltext/S0960-9822(22)01363-X'
+  },
+  wetLow: {
+    title: 'Fewer wet nappies than usual',
+    body: d => `Averaging ${d.wetPerDay} a day across ${d.n} logged days. Six or more heavy wet nappies daily is the `
+             + `usual reassurance sign once feeding is established. If it stays low, or she seems unusually `
+             + `sleepy or hard to rouse, ring the Kinderarzt rather than waiting for the next weigh-in.`,
+    link: null
+  },
+  cryPeak: {
+    title: 'She is in the crying peak',
+    body: d => `Kaia is ${Math.floor(d.ageDays/7)} weeks old. Crying rises from about two weeks, peaks between six and `
+             + `eight, and falls away by three to four months. Episodes that resist every soothing attempt are a `
+             + `feature of this window, not a sign anyone is doing it wrong.`,
+    link: 'https://www.nhshighland.scot.nhs.uk/your-services/all-services-a-z/maternity-and-neonatal/after-you-ve-had-your-baby/crying-and-your-baby/'
+  },
+  settleThin: {
+    title: 'Not enough settling data yet',
+    body: d => `${d.n} logged attempts. Ten per person, failures included, before any comparison between handlers `
+             + `means anything — and rotate who goes first, or whoever takes over inherits a baby who has already `
+             + `worn herself out.`,
+    link: null
+  }
+};
+
+function tipsFor(r, scope){
+  const out = [];
+  const g = r.growth;
+  if (scope === 'growth' && g && g.gain){
+    if (g.drift != null && g.drift < -0.67){
+      const s = g.series, first = s.find(w => g.latest.days - w.days >= 7);
+      out.push(['weightDrift', { fromPct: ord(Math.round(first ? first.percentile : 50)),
+        toPct: ord(Math.round(g.percentile)), spanDays: g.gain.spanDays }]);
+    } else if (g.gain.ratio != null && g.gain.ratio < 0.6){
+      out.push(['weightSlow', g.gain]);
+    }
+  }
+  if (scope === 'now' && r.awakeMin != null && r.awakeMin >= 90 && !r.openSleep){
+    out.push(['awakeLong', { awakeMin: r.awakeMin }]);
+  }
+  if (scope === 'trends'){
+    const w = windowStats(r.days, 7);
+    if (w.n >= 3 && w.wetPerDay < 5) out.push(['wetLow', w]);
+    const age = ageDays(Date.now());
+    if (age >= 14 && age <= 84) out.push(['cryPeak', { ageDays: age }]);
+    if (r.settleCount < 10) out.push(['settleThin', { n: r.settleCount }]);
+  }
+  return out.map(([k, d]) => {
+    const t = TIPS[k];
+    return `<div class="note ${k==='awakeLong'||k==='cryPeak'||k==='settleThin'?'calm':''}">`
+      + `<b>${t.title}</b>${t.body(d)}`
+      + (t.link ? `<a href="${t.link}" target="_blank" rel="noopener">Read more</a>` : '')
+      + `</div>`;
+  }).join('');
+}
+
+/* ============================================================
+   DAY VIEW — 24-hour swimlane, one row per day.
+   Sleep as blocks, feeds as ticks, nappies as dots.
+   ============================================================ */
+function renderDay(r){
+  const el = $('tab-day');
+  const days = r.days.slice(-14).reverse();
+  if (!days.length){ el.innerHTML = '<p class="empty">Log a feed or a sleep and the day view fills in.</p>'; return; }
+
+  const W = 720, LEFT = 54, RIGHT = 8, ROW = 30, TOP = 18;
+  const plotW = W - LEFT - RIGHT;
+  const x = mins => LEFT + (mins/1440)*plotW;
+  let s = `<svg viewBox="0 0 ${W} ${TOP + days.length*ROW + 6}" role="img" aria-label="Daily pattern">`;
+
+  for (let h=0; h<=24; h+=3){
+    s += `<line x1="${x(h*60)}" y1="${TOP-6}" x2="${x(h*60)}" y2="${TOP + days.length*ROW}" stroke="#232931" stroke-width="1"/>`;
+    s += `<text x="${x(h*60)}" y="${TOP-10}" fill="#5B626B" font-size="11" font-family="ui-monospace,monospace" text-anchor="middle">${h===24?0:h}</text>`;
+  }
+
+  days.forEach((d, i) => {
+    const y = TOP + i*ROW;
+    s += `<text x="0" y="${y+18}" fill="#868D96" font-size="11" font-family="ui-monospace,monospace">${dayLabel(d.ms).slice(0,6)}</text>`;
+    s += `<rect x="${LEFT}" y="${y+5}" width="${plotW}" height="20" fill="#141920" rx="3"/>`;
+
+    for (const sl of d.sleeps){
+      const end = sl.end_ts || Date.now();
+      let cur = sl.ts;
+      while (cur < end){
+        const seg = Math.min(end, startOfDay(cur) + DAY);
+        if (dayKey(cur) === d.key){
+          const a = (cur - startOfDay(cur))/60000, b = (seg - startOfDay(cur))/60000;
+          s += `<rect x="${x(a)}" y="${y+5}" width="${Math.max(1.5, x(b)-x(a))}" height="20" fill="#9483B4" opacity=".55" rx="2"/>`;
+        }
+        cur = seg;
+      }
+    }
+    for (const st of d.settles){
+      const a = (st.ts - d.ms)/60000;
+      s += `<rect x="${x(a)}" y="${y+5}" width="3" height="20" fill="#C08497"/>`;
+    }
+    for (const f of d.feeds){
+      const a = (f.ts - d.ms)/60000;
+      s += `<rect x="${x(a)-1}" y="${y+2}" width="2" height="8" fill="#E9A23B"/>`;
+    }
+    for (const n of d.nappies){
+      const a = (n.ts - d.ms)/60000;
+      s += `<circle cx="${x(a)}" cy="${y+28}" r="2.2" fill="#7FA06B"/>`;
+    }
+  });
+  s += `</svg>`;
+
+  const rows = days.map(d => `<button class="row" disabled style="opacity:1">
+      <span class="t">${dayLabel(d.ms).slice(0,6)}</span>
+      <span class="d">${d.feedCount} feeds · ${d.nappyCount} nappies · ${(d.sleepMin/60).toFixed(1)}h sleep
+        <span class="n">longest stretch ${Math.floor(d.longestSleepMin/60)}h${pad(d.longestSleepMin%60)}${
+          d.medianFeedGapMin ? ' · typical feed gap ' + Math.floor(d.medianFeedGapMin/60) + 'h' + pad(d.medianFeedGapMin%60) : ''}</span></span>
+    </button>`).join('');
+
+  el.innerHTML = `<div class="legend">
+      <span><i style="background:#9483B4"></i>sleep</span>
+      <span><i style="background:#E9A23B"></i>feed</span>
+      <span><i style="background:#7FA06B"></i>nappy</span>
+      <span><i style="background:#C08497"></i>settling</span>
+    </div>
+    <div class="swim">${s}</div>
+    <div class="log">${rows}</div>`;
+}
+
+/* ============================================================
+   TRENDS — rolling windows, plus the settling comparison
+   ============================================================ */
+let trendWin = 7;
+function renderTrends(r){
+  const el = $('tab-trends');
+  const w = windowStats(r.days, trendWin);
+  if (!w.n){ el.innerHTML = '<p class="empty">Trends appear once a few full days are logged.</p>'; return; }
+
+  const seg = [7,14,28].map(n =>
+    `<button data-win="${n}" aria-pressed="${n===trendWin}">${n} days</button>`).join('');
+
+  const hm = m => Math.floor(m/60)+'h'+pad(Math.round(m%60));
+  const stats = `
+    <div class="stat-grid">
+      <div class="stat"><span class="k">feeds / day</span><span class="v">${w.feedsPerDay}</span></div>
+      <div class="stat"><span class="k">bottle / day</span><span class="v">${w.bottleMl}<small> ml</small></span></div>
+      <div class="stat"><span class="k">sleep / day</span><span class="v">${hm(w.sleepMin)}</span></div>
+      <div class="stat"><span class="k">longest night</span><span class="v">${hm(w.longestNightMin)}</span></div>
+      <div class="stat"><span class="k">wet nappies / day</span><span class="v">${w.wetPerDay}</span></div>
+      <div class="stat"><span class="k">pumped / day</span><span class="v">${w.pumpMl}<small> ml</small></span></div>
+    </div>`;
+
+  const src = r.days.filter(d => d.complete).slice(-trendWin);
+  const bars = (vals, colour, fmt) => {
+    const W=720, H=110, max = Math.max(1, ...vals);
+    const bw = W/Math.max(1,vals.length);
+    return `<svg viewBox="0 0 ${W} ${H}">` + vals.map((v,i) => {
+      const h = (v/max)*(H-22);
+      return `<rect x="${i*bw+bw*0.18}" y="${H-22-h}" width="${bw*0.64}" height="${Math.max(1,h)}" fill="${colour}" rx="2"/>`;
+    }).join('') + `<text x="0" y="${H-6}" fill="#5B626B" font-size="12" font-family="ui-monospace,monospace">${fmt(vals[0])}</text>`
+      + `<text x="${W}" y="${H-6}" fill="#5B626B" font-size="12" font-family="ui-monospace,monospace" text-anchor="end">${fmt(vals[vals.length-1])}</text></svg>`;
+  };
+
+  el.innerHTML = `<div class="seg">${seg}</div>
+    <div class="card"><h3>Averages</h3>
+      <div class="sub">${w.n} complete day${w.n===1?'':'s'}, today excluded</div>${stats}</div>
+    <div class="card"><h3>Sleep per day</h3><div class="sub">oldest to newest</div>
+      ${bars(src.map(d=>d.sleepMin), '#9483B4', v=>hm(v||0))}</div>
+    <div class="card"><h3>Feeds per day</h3><div class="sub">oldest to newest</div>
+      ${bars(src.map(d=>d.feedCount), '#E9A23B', v=>(v||0)+' feeds')}</div>
+    ${renderSettling(r)}
+    ${tipsFor(r, 'trends')}`;
+
+  el.querySelectorAll('.seg button').forEach(b =>
+    b.onclick = () => { trendWin = +b.dataset.win; renderTrends(r); });
+}
+
+const HANDLER_NAME = { dom:'Dom', wife:'Wife', sil:'Sister-in-law', unknown:'Unlogged' };
+function renderSettling(r){
+  if (!r.settling.length) return '';
+  const max = Math.max(...r.settling.map(s => s.slowest));
+  const rows = r.settling.map(s => {
+    const pctW = (s.median/max)*100;
+    return `<div style="margin-top:14px">
+      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:13px">
+        <span>${HANDLER_NAME[s.handler]||s.handler}</span>
+        <span style="color:var(--dim)">${s.median} min · n=${s.n}</span></div>
+      <div style="height:8px;background:var(--panel-2);border-radius:4px;margin-top:5px;overflow:hidden">
+        <div style="height:100%;width:${pctW}%;background:var(--rose);border-radius:4px"></div></div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--dimmer);margin-top:4px">
+        range ${s.fastest}–${s.slowest} min</div></div>`;
+  }).join('');
+  return `<div class="card"><h3>Time to settle</h3>
+    <div class="sub">median per handler${r.settleCount < 30 ? ' — still a small sample' : ''}</div>${rows}</div>`;
+}
+
+/* ============================================================
+   GROWTH — measured weights against the WHO band
+   ============================================================ */
+function renderGrowth(r){
+  const el = $('tab-growth');
+  const g = r.growth;
+  if (!g){ el.innerHTML = '<p class="empty">Log a weight and the WHO curve appears here.</p>'; return; }
+
+  const maxDay = Math.max(98, g.latest.days + 21);
+  const W=720, H=300, L=46, B=28, T=10, R=10;
+  const px = d => L + (d/maxDay)*(W-L-R);
+  const yMin = kgAtZ(-2.6, 0) - 0.2, yMax = kgAtZ(2.6, maxDay) + 0.2;
+  const py = kg => T + (1 - (kg-yMin)/(yMax-yMin))*(H-T-B);
+
+  const band = (zLo, zHi, fill, op) => {
+    let top='', bot='';
+    for (let d=0; d<=maxDay; d+=7){ top += `${px(d)},${py(kgAtZ(zHi,d))} `; }
+    for (let d=maxDay; d>=0; d-=7){ bot += `${px(d)},${py(kgAtZ(zLo,d))} `; }
+    return `<polygon points="${top}${bot}" fill="${fill}" opacity="${op}"/>`;
+  };
+  const line = (z, colour, dash) => {
+    let p='';
+    for (let d=0; d<=maxDay; d+=7) p += (d?'L':'M') + px(d) + ',' + py(kgAtZ(z,d)) + ' ';
+    return `<path d="${p}" fill="none" stroke="${colour}" stroke-width="1.4" ${dash?'stroke-dasharray="4 4"':''}/>`;
+  };
+
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Weight against WHO standard">`;
+  s += band(-2, 2, '#6FA39C', .10) + band(-1, 1, '#6FA39C', .12);
+  s += line(2,'#33444C',1) + line(-2,'#33444C',1) + line(0,'#6FA39C',0);
+  for (let kg = Math.ceil(yMin); kg <= yMax; kg++){
+    s += `<line x1="${L}" y1="${py(kg)}" x2="${W-R}" y2="${py(kg)}" stroke="#232931" stroke-width=".6"/>`;
+    s += `<text x="${L-8}" y="${py(kg)+4}" fill="#5B626B" font-size="11" font-family="ui-monospace,monospace" text-anchor="end">${kg}kg</text>`;
+  }
+  for (let wk=0; wk*7<=maxDay; wk+=2){
+    s += `<text x="${px(wk*7)}" y="${H-8}" fill="#5B626B" font-size="11" font-family="ui-monospace,monospace" text-anchor="middle">${wk}w</text>`;
+  }
+  let path='';
+  g.series.forEach((p,i) => { path += (i?'L':'M') + px(p.days) + ',' + py(p.kg) + ' '; });
+  s += `<path d="${path}" fill="none" stroke="#E8E2D6" stroke-width="2" stroke-linejoin="round"/>`;
+  g.series.forEach(p => { s += `<circle cx="${px(p.days)}" cy="${py(p.kg)}" r="4" fill="#E8E2D6"/>`; });
+  s += `</svg>`;
+
+  const gain = g.gain ? `
+    <div class="stat-grid">
+      <div class="stat"><span class="k">measured</span><span class="v">${g.gain.actualPerWeek}<small> g/wk</small></span></div>
+      <div class="stat"><span class="k">WHO median</span><span class="v">${g.gain.expectedPerWeek}<small> g/wk</small></span></div>
+    </div>
+    <div class="sub" style="margin-top:12px">over ${g.gain.spanDays} days, ${g.series.length} measurement${g.series.length===1?'':'s'}</div>`
+  : `<div class="sub" style="margin-top:12px">Gain needs two weigh-ins at least 7 days apart. A shorter gap measures the scale, not the baby.</div>`;
+
+  el.innerHTML = `<div class="card">
+      <h3>${g.latest.kg.toFixed(2)} kg</h3>
+      <div class="big" style="color:var(--sea)">${ord(Math.round(g.percentile))}<span style="font-size:16px;color:var(--dim)"> centile</span></div>
+      <div class="sub">z ${g.z >= 0 ? '+' : ''}${g.z.toFixed(2)} · week ${Math.floor(g.latest.days/7)} · WHO girls weight-for-age</div>
+      ${gain}
+    </div>
+    <div class="card"><h3>Against the standard</h3>
+      <div class="sub">shaded bands are ±1 and ±2 standard deviations</div>${s}</div>
+    ${tipsFor(r, 'growth')}`;
+}
+
+/* ============================================================
+   STORAGE — IndexedDB, schema v2 with migration from v1
+   ============================================================ */
+const DB = 'babylog', STORE = 'events', SCHEMA = 2;
+let db, events = [], R = null;
+
+function openDb(){
   return new Promise((res, rej) => {
-    const r = indexedDB.open(DB, 1);
-    r.onupgradeneeded = e => {
-      const d = e.target.result;
-      if (!d.objectStoreNames.contains(STORE)) {
-        const s = d.createObjectStore(STORE, { keyPath: 'id' });
-        s.createIndex('ts', 'ts');
+    const rq = indexedDB.open(DB, SCHEMA);
+    rq.onupgradeneeded = e => {
+      const d = e.target.result, tr = e.target.transaction;
+      let store;
+      if (!d.objectStoreNames.contains(STORE)){
+        store = d.createObjectStore(STORE, { keyPath:'id' });
+        store.createIndex('ts', 'ts');
+      } else {
+        store = tr.objectStore(STORE);
+      }
+      /* v1 -> v2: fold the flat nullable columns into a typed data object.
+         Runs inside the upgrade transaction, so it either all lands or none does. */
+      if (e.oldVersion < 2){
+        store.openCursor().onsuccess = ev => {
+          const c = ev.target.result;
+          if (!c) return;
+          const o = c.value;
+          if (!o.v || o.v < 2){
+            const data = {};
+            if (o.type === 'feed'){
+              data.method = o.method || 'bottle';
+              if (o.side) data.side = o.side;
+              if (o.amount_ml != null) data.amount_ml = o.amount_ml;
+              if (o.duration_min != null) data.duration_min = o.duration_min;
+            } else if (o.type === 'nappy'){ data.kind = o.nappy || 'wet';
+            } else if (o.type === 'pump'){
+              if (o.amount_ml != null) data.amount_ml = o.amount_ml;
+              if (o.side) data.side = o.side;
+            } else if (o.type === 'weight'){ if (o.kg != null) data.kg = o.kg; }
+            c.update({ id:o.id, type:o.type, ts:o.ts, end_ts:o.end_ts ?? null, data,
+                       notes:o.notes || '', created_at:o.created_at || o.ts,
+                       updated_at:Date.now(), v:2 });
+          }
+          c.continue();
+        };
       }
     };
-    r.onsuccess = e => res(e.target.result);
-    r.onerror = () => rej(r.error);
+    rq.onsuccess = e => res(e.target.result);
+    rq.onerror = () => rej(rq.error);
   });
 }
-function tx(mode){ return db.transaction(STORE, mode).objectStore(STORE); }
-function put(rec){
-  return new Promise((res, rej) => { const q = tx('readwrite').put(rec); q.onsuccess = res; q.onerror = () => rej(q.error); });
-}
-function del(id){
-  return new Promise((res, rej) => { const q = tx('readwrite').delete(id); q.onsuccess = res; q.onerror = () => rej(q.error); });
-}
-function all(){
-  return new Promise((res, rej) => { const q = tx('readonly').getAll(); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); });
-}
+const tx = mode => db.transaction(STORE, mode).objectStore(STORE);
+const put = rec => new Promise((res,rej) => { const q = tx('readwrite').put(rec); q.onsuccess=res; q.onerror=()=>rej(q.error); });
+const del = id  => new Promise((res,rej) => { const q = tx('readwrite').delete(id); q.onsuccess=res; q.onerror=()=>rej(q.error); });
+const all = ()  => new Promise((res,rej) => { const q = tx('readonly').getAll(); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); });
 
-/* ---------- model ---------- */
 const uid = () => (crypto.randomUUID ? crypto.randomUUID()
-  : Date.now().toString(36) + Math.random().toString(36).slice(2, 10));
+  : Date.now().toString(36) + Math.random().toString(36).slice(2,10));
+const blank = type => ({ id:uid(), type, ts:Date.now(), end_ts:null, data:{}, notes:'',
+                         created_at:Date.now(), updated_at:Date.now(), v:2 });
 
-function blank(type){
-  const n = Date.now();
-  return { id: uid(), type, ts: n, end_ts: null, method: type === 'feed' ? 'bottle' : null,
-    side: null, amount_ml: null, duration_min: null, kg: null, nappy: type === 'nappy' ? 'wet' : null,
-    notes: '', created_at: n, updated_at: n, v: 1 };
-}
-
-let events = [];
 async function reload(){
-  events = (await all()).sort((a, b) => b.ts - a.ts);
+  events = (await all()).sort((a,b) => b.ts - a.ts);
+  R = rollup(events);
   render();
 }
 
-/* ---------- formatting ---------- */
-const pad = n => String(n).padStart(2, '0');
-const hhmm = ms => { const d = new Date(ms); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
-function dur(ms){
-  const m = Math.max(0, Math.floor(ms / 60000));
-  return Math.floor(m / 60) + ':' + pad(m % 60);
-}
-function dayKey(ms){ const d = new Date(ms); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
-function dayLabel(ms){
-  const t = dayKey(Date.now()), y = dayKey(Date.now() - 864e5), k = dayKey(ms);
-  if (k === t) return 'today';
-  if (k === y) return 'yesterday';
-  return new Date(ms).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }).toLowerCase();
-}
+/* ---------- describing an event ---------- */
 function describe(e){
-  if (e.type === 'feed') {
-    if (e.method === 'breast') {
-      const s = { L: 'left', R: 'right', both: 'both sides' }[e.side] || '';
-      return 'Breast' + (s ? ' · ' + s : '') + (e.duration_min ? ' · ' + e.duration_min + ' min' : '');
+  const d = e.data || {};
+  if (e.type === 'feed'){
+    if (d.method === 'breast'){
+      const s = { L:'left', R:'right', both:'both sides' }[d.side] || '';
+      return 'Breast' + (s ? ' · '+s : '') + (d.duration_min ? ' · '+d.duration_min+' min' : '');
     }
-    return 'Bottle' + (e.amount_ml ? ' · ' + e.amount_ml + ' ml' : '');
+    return 'Bottle' + (d.amount_ml ? ' · '+d.amount_ml+' ml' : '');
   }
-  if (e.type === 'nappy') return { wet: 'Nappy · wet', dirty: 'Nappy · dirty', both: 'Nappy · wet + dirty' }[e.nappy] || 'Nappy';
-  if (e.type === 'pump') return 'Pumped' + (e.amount_ml ? ' · ' + e.amount_ml + ' ml' : '') +
-    (e.side && e.side !== 'both' ? ' · ' + (e.side === 'L' ? 'left' : 'right') : '');
-  if (e.type === 'sleep') return e.end_ts ? 'Slept · ' + dur(e.end_ts - e.ts) : 'Asleep — still going';
-  if (e.type === 'weight') return 'Weighed · ' + (e.kg != null ? e.kg.toFixed(2) + ' kg' : '—');
+  if (e.type === 'nappy') return { wet:'Nappy · wet', dirty:'Nappy · dirty', both:'Nappy · wet + dirty' }[d.kind] || 'Nappy';
+  if (e.type === 'pump')  return 'Pumped' + (d.amount_ml ? ' · '+d.amount_ml+' ml' : '')
+    + (d.side && d.side !== 'both' ? ' · '+(d.side==='L'?'left':'right') : '');
+  if (e.type === 'sleep') return e.end_ts ? 'Slept · '+dur(e.end_ts - e.ts) : 'Asleep — still going';
+  if (e.type === 'weight'){
+    if (d.kg == null) return 'Weighed';
+    const days = ageDays(e.ts);
+    return 'Weighed · ' + d.kg.toFixed(2) + ' kg · ' + ord(Math.round(pct(zScore(d.kg, days)))) + ' centile';
+  }
+  if (e.type === 'settle'){
+    const who = HANDLER_NAME[d.handler] || 'Someone';
+    if (!e.end_ts) return who + ' settling — still going';
+    const mins = Math.round((e.end_ts - e.ts)/60000);
+    const out = { calm:'calmed', asleep:'fell asleep', handed:'handed over' }[d.outcome] || 'settled';
+    return `${who} · ${mins} min · ${out}`;
+  }
   return e.type;
 }
 
-/* ---------- render ---------- */
+/* ============================================================
+   RENDER
+   ============================================================ */
 const $ = id => document.getElementById(id);
+let tab = 'now';
 
 function render(){
   const today = dayKey(Date.now());
   const td = events.filter(e => dayKey(e.ts) === today);
-  $('tFeeds').textContent = td.filter(e => e.type === 'feed').length;
-  $('tBottle').textContent = td.filter(e => e.type === 'feed' && e.method === 'bottle')
-    .reduce((s, e) => s + (e.amount_ml || 0), 0);
-  $('tNappy').textContent = td.filter(e => e.type === 'nappy').length;
-  $('tPump').textContent = td.filter(e => e.type === 'pump').reduce((s, e) => s + (e.amount_ml || 0), 0);
+  $('tFeeds').textContent  = td.filter(e => e.type==='feed').length;
+  $('tBottle').textContent = td.filter(e => e.type==='feed' && (e.data||{}).method==='bottle')
+                               .reduce((s,e) => s + ((e.data||{}).amount_ml||0), 0);
+  $('tNappy').textContent  = td.filter(e => e.type==='nappy').length;
+  $('tPump').textContent   = td.filter(e => e.type==='pump').reduce((s,e) => s + ((e.data||{}).amount_ml||0), 0);
 
-  const weights = events.filter(e => e.type === 'weight' && e.kg != null);
-  if (weights.length) {
-    const [now, prev] = weights;
-    $('wKg').textContent = now.kg.toFixed(2) + ' kg';
-    const days = Math.round((Date.now() - now.ts) / 864e5);
-    const when = days === 0 ? 'today' : days === 1 ? 'yesterday' : days + ' days ago';
-    if (prev) {
-      const g = Math.round((now.kg - prev.kg) * 1000);
-      const span = Math.max(1, Math.round((now.ts - prev.ts) / 864e5));
-      $('wMeta').innerHTML = '<b>' + (g >= 0 ? '+' : '') + g + ' g</b> over ' + span + 'd · ' + when;
-    } else {
-      $('wMeta').textContent = when;
-    }
-  } else {
-    $('wKg').textContent = '— kg';
-    $('wMeta').textContent = 'tap to log';
-  }
+  const g = R.growth;
+  if (g){
+    $('wKg').textContent = g.latest.kg.toFixed(2) + ' kg';
+    const days = Math.round((Date.now() - g.latest.ts)/DAY);
+    const when = days===0 ? 'today' : days===1 ? 'yesterday' : days+' days ago';
+    $('wMeta').innerHTML = g.gain
+      ? `<b>${g.gain.actualPerWeek > 0 ? '+' : ''}${g.gain.actualPerWeek} g/wk</b> · ${ord(Math.round(g.percentile))} · ${when}`
+      : `${ord(Math.round(g.percentile))} centile · ${when}`;
+  } else { $('wKg').textContent = '— kg'; $('wMeta').textContent = 'tap to log'; }
+
+  $('nowNotes').innerHTML = tipsFor(R, 'now');
 
   const log = $('log');
-  log.innerHTML = '';
-  if (!events.length) {
-    log.innerHTML = '<p class="empty">Nothing logged yet. Tap Feed below to start.</p>';
-  } else {
-    let cur = null;
-    for (const e of events.slice(0, 300)) {
+  if (!events.length){ log.innerHTML = '<p class="empty">Nothing logged yet. Use the buttons below.</p>'; }
+  else {
+    let html = '', seen = '';
+    for (const e of events.slice(0, 60)){
       const k = dayKey(e.ts);
-      if (k !== cur) {
-        cur = k;
-        const h = document.createElement('div');
-        h.className = 'daymark'; h.textContent = dayLabel(e.ts);
-        log.appendChild(h);
-      }
-      const b = document.createElement('button');
-      b.className = 'row ' + e.type;
-      b.innerHTML = '<span class="t"></span><span class="bar"></span><span class="d"></span>';
-      b.querySelector('.t').textContent = hhmm(e.ts);
-      const d = b.querySelector('.d');
-      d.textContent = describe(e);
-      if (e.notes) { const n = document.createElement('span'); n.className = 'n'; n.textContent = e.notes; d.appendChild(n); }
-      b.onclick = () => openSheet(e.type, e);
-      log.appendChild(b);
+      if (k !== seen){ seen = k; html += `<div class="daymark">${dayLabel(e.ts)}</div>`; }
+      html += `<button class="row ${e.type}" data-id="${e.id}">
+        <span class="t">${hhmm(e.ts)}</span><span class="bar"></span>
+        <span class="d">${describe(e)}${e.notes ? `<span class="n">${e.notes.replace(/[<>]/g,'')}</span>` : ''}</span></button>`;
     }
+    log.innerHTML = html;
+    log.querySelectorAll('.row').forEach(b =>
+      b.onclick = () => { const e = events.find(x => x.id === b.dataset.id); if (e) openSheet(e.type, e); });
   }
+
+  if (tab === 'day')    renderDay(R);
+  if (tab === 'trends') renderTrends(R);
+  if (tab === 'growth') renderGrowth(R);
   tick();
 }
 
 function tick(){
-  const lastFeed = events.find(e => e.type === 'feed');
+  if (!R) return;
+  const lf = R.lastFeed;
   const c = $('clock');
-  if (lastFeed) {
-    const gap = Date.now() - lastFeed.ts;
-    c.textContent = dur(gap);
-    c.className = 'clock ' + (gap > 3 * 36e5 ? 'late' : gap > 9e5 ? 'warm' : '');
-    $('lastfeed').textContent = describe(lastFeed).toLowerCase() + ' at ' + hhmm(lastFeed.ts);
-  } else {
-    c.textContent = '—:—'; c.className = 'clock';
-    $('lastfeed').textContent = 'nothing logged yet';
+  if (lf){
+    const ms = Date.now() - lf.ts;
+    c.textContent = dur(ms);
+    c.className = 'clock' + (ms > 3*36e5 ? ' late' : ms > 9e5 ? ' warm' : '');
+    $('lastfeed').textContent = describe(lf).toLowerCase() + ' at ' + hhmm(lf.ts);
+  } else { c.textContent = '—:—'; c.className='clock'; $('lastfeed').textContent = 'nothing logged yet'; }
+
+  const os = R.openSleep;
+  $('activeSleep').classList.toggle('on', !!os);
+  if (os) $('sleepDur').textContent = dur(Date.now() - os.ts);
+
+  const ot = R.openSettle;
+  $('activeSettle').classList.toggle('on', !!ot);
+  if (ot){
+    $('settleDur').textContent = dur(Date.now() - ot.ts);
+    $('settleWho').textContent = HANDLER_NAME[(ot.data||{}).handler] || '—';
   }
-  const nap = events.find(e => e.type === 'sleep' && !e.end_ts);
-  $('activeSleep').classList.toggle('on', !!nap);
-  $('sleepBtn').classList.toggle('hide', false);
-  if (nap) $('sleepDur').textContent = dur(Date.now() - nap.ts);
 }
-setInterval(tick, 10000);
+setInterval(() => { if (R) tick(); }, 20000);
 
-/* ---------- sheet ---------- */
-let draft = null, editing = false;
+/* ============================================================
+   SHEET
+   ============================================================ */
+let editing = null, groups = {};
+const FIELDS = {
+  feed:   ['fMethod','fSide','fAmount','fMins','fDate','fTime'],
+  nappy:  ['fNappy','fDate','fTime'],
+  pump:   ['fAmount','fSide','fDate','fTime'],
+  sleep:  ['fDate','fTime'],
+  weight: ['fKg','fDate','fTime'],
+  settle: ['fHandler','fStart','fTakeover','fMove','fSwaddle','fSkin','fSound','fChanges','fOutcome','fDate','fTime']
+};
+const TITLES = { feed:'Feed', nappy:'Nappy', pump:'Pump', sleep:'Sleep', weight:'Weight', settle:'Settling attempt' };
 
-function setGroup(group, val){
-  document.querySelectorAll('[data-group="' + group + '"] .chip').forEach(c => {
-    c.setAttribute('aria-pressed', String(c.dataset.val === val));
-  });
+function setGroup(g, val){
+  groups[g] = val;
+  document.querySelectorAll(`[data-group="${g}"] .chip`).forEach(c =>
+    c.setAttribute('aria-pressed', String(c.dataset.val === val)));
 }
-function getGroup(group){
-  const on = document.querySelector('[data-group="' + group + '"] .chip[aria-pressed="true"]');
-  return on ? on.dataset.val : null;
-}
-document.querySelectorAll('.chips').forEach(g => {
-  g.onclick = ev => {
-    const c = ev.target.closest('.chip'); if (!c) return;
-    setGroup(g.dataset.group, c.dataset.val);
-    if (g.dataset.group === 'method') shapeSheet();
-  };
-});
+const getGroup = g => groups[g] ?? null;
 
-function shapeSheet(){
-  const t = draft.type, method = getGroup('method');
-  $('fMethod').classList.toggle('hide', t !== 'feed');
-  $('fNappy').classList.toggle('hide', t !== 'nappy');
-  $('fSide').classList.toggle('hide', !(t === 'pump' || (t === 'feed' && method === 'breast')));
-  $('fAmount').classList.toggle('hide', !(t === 'pump' || (t === 'feed' && method === 'bottle')));
-  $('fMins').classList.toggle('hide', !(t === 'feed' && method === 'breast'));
-  $('fKg').classList.toggle('hide', t !== 'weight');
-  $('fDate').classList.toggle('hide', t !== 'weight');
-  $('fTime').classList.toggle('hide', t === 'weight');
-  $('timeLabel').textContent = t === 'sleep' ? 'Fell asleep' : 'Time';
+function shapeSheet(type){
+  const show = new Set(FIELDS[type]);
+  ['fMethod','fSide','fNappy','fAmount','fMins','fKg','fHandler','fStart','fTakeover','fMove',
+   'fSwaddle','fSkin','fSound','fChanges','fOutcome','fDate','fTime'].forEach(id =>
+    $(id).classList.toggle('hide', !show.has(id)));
+  if (type === 'feed'){
+    const breast = getGroup('method') === 'breast';
+    $('fSide').classList.toggle('hide', !breast);
+    $('fAmount').classList.toggle('hide', breast);
+    $('fMins').classList.toggle('hide', !breast);
+  }
+  $('amountLabel').textContent = type === 'pump' ? 'Pumped (ml)' : 'Amount (ml)';
+  $('timeLabel').textContent = (type === 'sleep' || type === 'settle') ? 'Started' : 'Time';
 }
 
 function openSheet(type, rec){
-  editing = !!rec;
-  draft = rec ? Object.assign({}, rec) : blank(type);
-  $('sheetTitle').textContent = (editing ? 'Edit ' : '') +
-    { feed: 'Feed', nappy: 'Nappy', pump: 'Pump', sleep: 'Sleep', weight: 'Weight' }[draft.type];
-  setGroup('method', draft.method); setGroup('side', draft.side); setGroup('nappy', draft.nappy);
-  $('amount').value = draft.amount_ml ?? '';
-  $('mins').value = draft.duration_min ?? '';
-  $('kg').value = draft.kg ?? '';
-  $('notes').value = draft.notes || '';
-  $('time').value = hhmm(draft.ts);
-  $('date').value = dayKey(draft.ts);
-  $('delBtn').classList.toggle('hide', !editing);
-  shapeSheet();
+  editing = rec || blank(type);
+  groups = {};
+  const d = editing.data || {};
+  if (type === 'feed'){ setGroup('method', d.method || 'bottle'); if (d.side) setGroup('side', d.side); }
+  if (type === 'nappy')  setGroup('nappy', d.kind || 'wet');
+  if (type === 'pump' && d.side) setGroup('side', d.side);
+  if (type === 'settle'){
+    ['handler','startState','takeover','movement','swaddle','skin','sound','changes','outcome']
+      .forEach(k => { if (d[k] != null) setGroup(k, String(d[k])); });
+  }
+  $('amount').value = d.amount_ml ?? '';
+  $('mins').value   = d.duration_min ?? '';
+  $('kg').value     = d.kg ?? '';
+  $('notes').value  = editing.notes || '';
+  const dt = new Date(editing.ts);
+  $('date').value = dayKey(editing.ts);
+  $('time').value = pad(dt.getHours()) + ':' + pad(dt.getMinutes());
+  $('sheetTitle').textContent = TITLES[type];
+  $('delBtn').classList.toggle('hide', !rec);
+  shapeSheet(type);
   $('scrim').classList.add('on'); $('sheet').classList.add('on');
 }
-function closeSheet(){
-  $('scrim').classList.remove('on'); $('sheet').classList.remove('on'); draft = null;
-}
-$('scrim').onclick = closeSheet;
+function closeSheet(){ $('scrim').classList.remove('on'); $('sheet').classList.remove('on'); editing = null; }
 
-document.querySelectorAll('.nudge').forEach(b => {
-  b.onclick = () => {
-    const [h, m] = $('time').value.split(':').map(Number);
-    const d = new Date(); d.setHours(h, m + Number(b.dataset.nudge), 0, 0);
-    $('time').value = pad(d.getHours()) + ':' + pad(d.getMinutes());
-  };
+document.querySelectorAll('.chips').forEach(box => box.addEventListener('click', ev => {
+  const c = ev.target.closest('.chip'); if (!c) return;
+  setGroup(box.dataset.group, c.dataset.val);
+  if (editing) shapeSheet(editing.type);
+}));
+document.querySelectorAll('.nudge').forEach(b => b.onclick = () => {
+  const [h,m] = $('time').value.split(':').map(Number);
+  const d = new Date(); d.setHours(h, m + Number(b.dataset.nudge), 0, 0);
+  $('time').value = pad(d.getHours()) + ':' + pad(d.getMinutes());
 });
 
 $('saveBtn').onclick = async () => {
-  if (draft.type === 'weight') {
-    if ($('kg').value === '') return toast('Enter a weight first');
-    const [Y, M, D] = ($('date').value || dayKey(Date.now())).split('-').map(Number);
-    const d = new Date(draft.ts); d.setFullYear(Y, M - 1, D);
-    draft.ts = d.getTime();
-    draft.kg = Number($('kg').value);
-  } else {
-    const [h, m] = ($('time').value || hhmm(Date.now())).split(':').map(Number);
-    const base = new Date(draft.ts); base.setHours(h, m, 0, 0);
-    let ts = base.getTime();
-    // a time later than now on a fresh entry means it was yesterday
-    if (!editing && ts > Date.now() + 60000) ts -= 864e5;
-    draft.ts = ts;
-    draft.kg = null;
+  if (!editing) return;
+  const t = editing.type, d = {};
+  const [Y,M,D] = $('date').value.split('-').map(Number);
+  const [h,m] = $('time').value.split(':').map(Number);
+  editing.ts = new Date(Y, M-1, D, h, m, 0, 0).getTime();
+
+  if (t === 'feed'){
+    d.method = getGroup('method') || 'bottle';
+    if (d.method === 'breast'){ d.side = getGroup('side'); if ($('mins').value) d.duration_min = +$('mins').value; }
+    else if ($('amount').value) d.amount_ml = +$('amount').value;
   }
-
-  draft.method = draft.type === 'feed' ? getGroup('method') : null;
-  draft.nappy = draft.type === 'nappy' ? getGroup('nappy') : null;
-  draft.side = (draft.type === 'pump' || (draft.type === 'feed' && draft.method === 'breast')) ? getGroup('side') : null;
-  draft.amount_ml = $('amount').value === '' ? null : Number($('amount').value);
-  draft.duration_min = $('mins').value === '' ? null : Number($('mins').value);
-  draft.notes = $('notes').value.trim();
-  draft.updated_at = Date.now();
-
-  await put(draft);
-  closeSheet(); await reload();
-  toast(editing ? 'Updated' : 'Logged');
-  if (navigator.vibrate) navigator.vibrate(12);
+  if (t === 'nappy') d.kind = getGroup('nappy') || 'wet';
+  if (t === 'pump'){ if ($('amount').value) d.amount_ml = +$('amount').value; if (getGroup('side')) d.side = getGroup('side'); }
+  if (t === 'weight'){
+    if (!$('kg').value){ toast('Enter a weight'); return; }
+    d.kg = +$('kg').value;
+  }
+  if (t === 'settle'){
+    if (!getGroup('handler')){ toast('Pick who is holding her'); return; }
+    ['handler','startState','takeover','movement','swaddle','skin','sound','changes','outcome']
+      .forEach(k => { const v = getGroup(k); if (v != null) d[k] = v; });
+  }
+  editing.data = d;
+  editing.notes = $('notes').value.trim();
+  editing.updated_at = Date.now();
+  await put(editing);
+  closeSheet(); await reload(); toast('Saved');
 };
-
 $('delBtn').onclick = async () => {
-  await del(draft.id); closeSheet(); await reload(); toast('Deleted');
+  if (!editing) return;
+  await del(editing.id); closeSheet(); await reload(); toast('Deleted');
 };
+$('scrim').onclick = closeSheet;
 
 /* ---------- quick actions ---------- */
-document.querySelectorAll('[data-new]').forEach(b => {
-  b.onclick = async () => {
-    const t = b.dataset.new;
-    if (t === 'sleep') {
-      const nap = events.find(e => e.type === 'sleep' && !e.end_ts);
-      if (nap) return wake();
-      const rec = blank('sleep');
-      await put(rec); await reload(); toast('Sleep started');
-      if (navigator.vibrate) navigator.vibrate(12);
-      return;
-    }
-    openSheet(t);
-  };
+document.querySelectorAll('[data-new]').forEach(b => b.onclick = async () => {
+  const t = b.dataset.new;
+  /* Sleep and settling are stopwatches: one tap starts, one tap ends. */
+  if (t === 'sleep'){
+    if (R.openSleep) return wake();
+    const rec = blank('sleep'); await put(rec); await reload(); toast('Sleep started'); return;
+  }
+  if (t === 'settle'){
+    if (R.openSettle) return openSheet('settle', R.openSettle);
+    openSheet('settle', null); return;
+  }
+  openSheet(t, null);
 });
+$('weightStrip').onclick = () => openSheet('weight', null);
+
 async function wake(){
-  const nap = events.find(e => e.type === 'sleep' && !e.end_ts);
-  if (!nap) return;
-  nap.end_ts = Date.now(); nap.duration_min = Math.round((nap.end_ts - nap.ts) / 60000);
-  nap.updated_at = Date.now();
-  await put(nap); await reload(); toast('Slept ' + dur(nap.end_ts - nap.ts));
+  const s = R.openSleep; if (!s) return;
+  s.end_ts = Date.now(); s.updated_at = Date.now();
+  await put(s); await reload(); toast('Awake');
 }
 $('wakeBtn').onclick = wake;
-$('weightStrip').onclick = () => openSheet('weight');
+$('calmBtn').onclick = async () => {
+  const s = R.openSettle; if (!s) return;
+  s.end_ts = Date.now(); s.updated_at = Date.now();
+  await put(s); await reload();
+  toast(`Settled in ${Math.round((s.end_ts - s.ts)/60000)} min`);
+  openSheet('settle', s);
+};
 
-/* ---------- export / import ---------- */
-$('exportBtn').onclick = async () => {
-  const data = { app: 'babylog', v: 1, exported_at: new Date().toISOString(), events: await all() };
-  const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+/* ---------- tabs ---------- */
+document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => {
+  tab = b.dataset.tab;
+  document.querySelectorAll('[data-tab]').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+  ['now','day','trends','growth'].forEach(t => $('tab-'+t).classList.toggle('hide', t !== tab));
+  document.querySelector('.bar-actions').classList.toggle('hide', false);
+  render(); window.scrollTo(0,0);
+});
+
+/* ---------- data in and out ---------- */
+function download(name, text){
   const a = document.createElement('a');
-  a.href = url; a.download = 'babylog-' + dayKey(Date.now()) + '.json';
-  a.click(); URL.revokeObjectURL(url);
+  a.href = URL.createObjectURL(new Blob([text], {type:'application/json'}));
+  a.download = name; a.click(); URL.revokeObjectURL(a.href);
+}
+$('exportBtn').onclick = () => {
+  download(`babylog-${dayKey(Date.now())}.json`,
+    JSON.stringify({ schema:2, birth:BIRTH, exported:new Date().toISOString(), events }, null, 1));
 };
 $('importFile').onchange = async ev => {
   const f = ev.target.files[0]; if (!f) return;
   try {
-    const data = JSON.parse(await f.text());
-    const list = Array.isArray(data) ? data : data.events;
+    const raw = JSON.parse(await f.text());
+    const list = Array.isArray(raw) ? raw : raw.events;
     if (!Array.isArray(list)) throw new Error('no events array');
-    for (const e of list) if (e && e.id && e.ts) await put(e);
-    await reload(); toast('Imported ' + list.length);
-  } catch (err) {
-    toast("That file isn't a Log export");
-  }
+    let n = 0;
+    for (const o of list){
+      if (!o || !o.type || !o.ts) continue;
+      /* merge, never clobber: an id already present is left alone */
+      if (events.some(e => e.id === o.id)) continue;
+      await put(o.v === 2 ? o : migrateOne(o));
+      n++;
+    }
+    await reload(); toast(`Imported ${n}`);
+  } catch(err){ toast('Import failed: ' + err.message); }
   ev.target.value = '';
 };
+function migrateOne(o){
+  const data = {};
+  if (o.type==='feed'){ data.method=o.method||'bottle'; if(o.side)data.side=o.side;
+    if(o.amount_ml!=null)data.amount_ml=o.amount_ml; if(o.duration_min!=null)data.duration_min=o.duration_min; }
+  else if (o.type==='nappy') data.kind = o.nappy||'wet';
+  else if (o.type==='pump'){ if(o.amount_ml!=null)data.amount_ml=o.amount_ml; if(o.side)data.side=o.side; }
+  else if (o.type==='weight'){ if(o.kg!=null)data.kg=o.kg; }
+  return { id:o.id||uid(), type:o.type, ts:o.ts, end_ts:o.end_ts??null, data,
+           notes:o.notes||'', created_at:o.created_at||o.ts, updated_at:Date.now(), v:2 };
+}
 
 let toastT;
 function toast(msg){
   const t = $('toast'); t.textContent = msg; t.classList.add('on');
-  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 1800);
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 1900);
 }
 
 /* ---------- boot ---------- */
 (async () => {
-  db = await open();
-  if (navigator.storage && navigator.storage.persist) {
-    const already = await navigator.storage.persisted();
-    if (!already) await navigator.storage.persist();
+  /* Ask the browser not to evict this database. Without it, storage pressure
+     can bin the whole log and there is no undo. */
+  if (navigator.storage && navigator.storage.persist){
+    try { await navigator.storage.persist(); } catch(_){}
   }
+  db = await openDb();
   await reload();
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();
-document.addEventListener('visibilitychange', () => { if (!document.hidden) reload(); });
 </script>
 </body>
 </html>
